@@ -1,0 +1,10 @@
+---
+name: yambs
+version: "{{major}}.{{minor}}.{{patch}}"
+description: Yet another meta build-system.
+entry: {{entry}}
+requirements:
+  - vcorelib
+dev_requirements:
+  - setuptools-wrapper
+  - types-setuptools
