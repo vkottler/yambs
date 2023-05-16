@@ -1,4 +1,7 @@
 ---
-boards:
-  - name: relax_kit
-  - name: grand_central
+includes:
+  - yambs/boards.yaml
+  - yambs/chips.yaml
+
+toolchains:
+  arm-picolibc-eabi: {}

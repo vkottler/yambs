@@ -2,6 +2,8 @@
 
 set -e
 
+rm -rf build.ninja ninja
+
 "../../../../../venv$PYTHON_VERSION/bin/mbs" gen
 
 cat_file() {
@@ -10,5 +12,4 @@ cat_file() {
 	echo "------------------"
 }
 
-cat_file build.ninja
-cat_file ninja/all.ninja
+tree ninja

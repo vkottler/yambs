@@ -1,13 +1,27 @@
 ---
 type: object
 additionalProperties: false
-required: [boards]
+required: [boards, chips, toolchains]
 
 properties:
   boards:
     type: array
     items:
       $ref: package://yambs/schemas/Board.yaml
+
+  chips:
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^[a-zA-Z0-9-_.]+$":
+        $ref: package://yambs/schemas/Chip.yaml
+
+  toolchains:
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^[a-zA-Z0-9-_.]+$":
+        $ref: package://yambs/schemas/Toolchain.yaml
 
   src_root:
     type: string
@@ -21,9 +35,17 @@ properties:
     type: string
     default: ninja
 
+  build_root:
+    type: string
+    default: build
+
   toolchains_root:
     type: string
-    default: toolchains
+    default: "./toolchains/$toolchain/out/bin"
+
+  cc:
+    type: string
+    default: gcc
 
   common_cflags:
     type: array

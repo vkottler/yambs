@@ -1,0 +1,19 @@
+---
+chips:
+  xmc4700-2048:
+    arch: armv7e-m+fp
+    cpu: cortex-m4
+    extra_cflags: [-mfpu=auto -mfloat-abi=hard]
+    linker:
+      symbols:
+        __flash: "0x00000000"
+        __flash_size: "0x00004000"
+        __ram: "0x20000000"
+        __ram_size: "0x00010000"
+        __stack_size: "1k"
+
+  atsamd51-1024:
+    arch: TODO
+    cpu: TODO
+    linker:
+      symbols: {}

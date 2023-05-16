@@ -1,10 +1,12 @@
 ---
 type: object
 additionalProperties: false
-required: [name, chip]
 
 properties:
-  name:
+  specs:
     type: string
-  chip:
+    default: picolibc
+
+  c_standard:
     type: string
+    default: gnu17

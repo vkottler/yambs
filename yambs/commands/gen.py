@@ -22,9 +22,12 @@ from yambs.generate import generate
 def gen_cmd(args: _Namespace) -> int:
     """Execute the gen command."""
 
-    config = Config.decode(args.config)
+    config = Config.decode(args.config, includes_key="includes")
 
-    generate(args.dir, config)
+    config.root = args.dir
+    config.root.mkdir(parents=True, exist_ok=True)
+
+    generate(config)
 
     return (
         watch(
