@@ -2,7 +2,7 @@
     =====================================
     generator=datazen
     version=3.1.2
-    hash=c7c438b68bbaa5285bfdb26afdd14910
+    hash=f8a20fcdf0fd826ad54023d12cf161f0
     =====================================
 -->
 
@@ -130,7 +130,7 @@ following a specific convention), put your configuration data here.
 ```
 $ ./venv3.11/bin/mbs -h
 
-usage: mbs [-h] [--version] [-v] [-C DIR] {noop} ...
+usage: mbs [-h] [--version] [-v] [-C DIR] {gen,noop} ...
 
 Yet another meta build-system.
 
@@ -141,8 +141,29 @@ options:
   -C DIR, --dir DIR  execute from a specific directory
 
 commands:
-  {noop}             set of available commands
+  {gen,noop}         set of available commands
+    gen              poll the source tree and generate any new build files
     noop             command stub (does nothing)
+
+```
+
+## Sub-command Options
+
+### `gen`
+
+```
+$ ./venv3.11/bin/mbs gen -h
+
+usage: mbs gen [-h] [-c CONFIG] [-i] [-w]
+
+options:
+  -h, --help            show this help message and exit
+  -c CONFIG, --config CONFIG
+                        the path to the top-level configuration file (default:
+                        'yambs.yaml')
+  -i, --single-pass     only run a single watch iteration
+  -w, --watch           whether or not to continue watching for source tree
+                        changes
 
 ```
 

@@ -1,0 +1,32 @@
+---
+type: object
+additionalProperties: false
+required: [boards]
+
+properties:
+  boards:
+    type: array
+    items:
+      $ref: package://yambs/schemas/Board.yaml
+
+  src_root:
+    type: string
+    default: src
+
+  default_target:
+    type: string
+    default: all_boards
+
+  ninja_out:
+    type: string
+    default: ninja
+
+  toolchains_root:
+    type: string
+    default: toolchains
+
+  common_cflags:
+    type: array
+    default: [-Wall, -Werror]
+    items:
+      type: string
