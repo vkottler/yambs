@@ -1,0 +1,7 @@
+---
+boards:
+  - name: relax_kit
+    chip: xmc4700-2048
+
+  - name: grand_central
+    chip: atsamd51-1024
