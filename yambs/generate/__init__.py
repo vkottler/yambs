@@ -10,6 +10,7 @@ from vcorelib.paths import resource
 # internal
 from yambs import PKG_NAME
 from yambs.config import Config
+from yambs.generate.architectures import generate as generate_architectures
 from yambs.generate.boards import generate as generate_boards
 from yambs.generate.chips import generate as generate_chips
 from yambs.generate.common import render_template
@@ -33,6 +34,10 @@ def generate(config: Config) -> None:
     ninja_root = config.directory("ninja_out")
 
     # Generate all other files.
-    generate_boards(jinja, ninja_root, config)
-    generate_chips(jinja, ninja_root, config)
-    generate_toolchains(jinja, ninja_root, config)
+    for gen in [
+        generate_boards,
+        generate_chips,
+        generate_toolchains,
+        generate_architectures,
+    ]:
+        gen(jinja, ninja_root, config)

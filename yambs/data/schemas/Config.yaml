@@ -1,7 +1,7 @@
 ---
 type: object
 additionalProperties: false
-required: [boards, chips, toolchains]
+required: [boards, chips, toolchains, architectures]
 
 properties:
   boards:
@@ -23,6 +23,13 @@ properties:
       "^[a-zA-Z0-9-_.]+$":
         $ref: package://yambs/schemas/Toolchain.yaml
 
+  architectures:
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^[a-zA-Z0-9-_.+]+$":
+        $ref: package://yambs/schemas/Architecture.yaml
+
   src_root:
     type: string
     default: src
@@ -43,12 +50,17 @@ properties:
     type: string
     default: "./toolchains/$toolchain/out/bin"
 
+  # If set, overrides any other toolchain pathing or prefix construction.
+  toolchain_prefix:
+    type: string
+    default: ""
+
   cc:
     type: string
     default: gcc
 
   common_cflags:
     type: array
-    default: [-Wall, -Werror]
+    default: [-Wall, -Werror, -g]
     items:
       type: string
