@@ -1,0 +1,3 @@
+UF2 Bootloader v1.23.1-adafruit.1-88-g797305f SFHWRO
+Model: Grand Central M4 Express
+Board-ID: SAMD51P20A-GrandCentral-v0

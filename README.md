@@ -2,7 +2,7 @@
     =====================================
     generator=datazen
     version=3.1.2
-    hash=6f0dde62ff0b6f57cc4c8520ac87412c
+    hash=48ddeeed1a075ecca577bad65f289187
     =====================================
 -->
 
@@ -130,20 +130,21 @@ following a specific convention), put your configuration data here.
 ```
 $ ./venv3.11/bin/mbs -h
 
-usage: mbs [-h] [--version] [-v] [-C DIR] {gen,noop} ...
+usage: mbs [-h] [--version] [-v] [-C DIR] {gen,uf2conv,noop} ...
 
 Yet another meta build-system.
 
 options:
-  -h, --help         show this help message and exit
-  --version          show program's version number and exit
-  -v, --verbose      set to increase logging verbosity
-  -C DIR, --dir DIR  execute from a specific directory
+  -h, --help          show this help message and exit
+  --version           show program's version number and exit
+  -v, --verbose       set to increase logging verbosity
+  -C DIR, --dir DIR   execute from a specific directory
 
 commands:
-  {gen,noop}         set of available commands
-    gen              poll the source tree and generate any new build files
-    noop             command stub (does nothing)
+  {gen,uf2conv,noop}  set of available commands
+    gen               poll the source tree and generate any new build files
+    uf2conv           Convert to UF2 or flash directly.
+    noop              command stub (does nothing)
 
 ```
 
@@ -164,6 +165,38 @@ options:
   -i, --single-pass     only run a single watch iteration
   -w, --watch           whether or not to continue watching for source tree
                         changes
+
+```
+
+### `uf2conv`
+
+```
+$ ./venv3.11/bin/mbs uf2conv -h
+
+usage: mbs uf2conv [-h] [-b BASE] [-f FAMILY] [-o FILE] [-d DEVICE_PATH] [-l]
+                   [-c] [-D] [-w] [-C] [-i]
+                   [INPUT]
+
+positional arguments:
+  INPUT                 input file (HEX, BIN or UF2)
+
+options:
+  -h, --help            show this help message and exit
+  -b BASE, --base BASE  set base address of application for BIN format
+                        (default: 0x2000)
+  -f FAMILY, --family FAMILY
+                        specify familyID - number or name (default: 0x0)
+  -o FILE, --output FILE
+                        write output to named file; defaults to "flash.uf2" or
+                        "flash.bin" where sensible
+  -d DEVICE_PATH, --device DEVICE_PATH
+                        select a device path to flash
+  -l, --list            list connected devices
+  -c, --convert         do not flash, just convert
+  -D, --deploy          just flash, do not convert
+  -w, --wait            wait for device to flash
+  -C, --carray          convert binary file to a C array, not UF2
+  -i, --info            display header information from UF2, do not convert
 
 ```
 
