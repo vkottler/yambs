@@ -28,6 +28,9 @@ rule link
 rule bin
   command = ${toolchain_prefix}objcopy -O binary $in $out
 
+rule hex
+  command = ${toolchain_prefix}objcopy -O ihex $in $out
+
 rule dump
   command = ${toolchain_prefix}objdump -D $in > $out
 

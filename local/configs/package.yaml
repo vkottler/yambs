@@ -14,3 +14,5 @@ dev_requirements:
 commands:
   - name: gen
     description: poll the source tree and generate any new build files
+  - name: uf2conv
+    description: Convert to UF2 or flash directly.
