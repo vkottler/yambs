@@ -1,13 +1,12 @@
 ---
 type: object
 additionalProperties: false
-required: [name, chip]
+required: []
 
 properties:
-  name:
+  toolchain:
     type: string
-  chip:
-    type: string
+    default: arm-picolibc-eabi
 
   extra_cflags:
     type: array

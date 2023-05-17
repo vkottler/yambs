@@ -1,6 +1,6 @@
-toolchain = {{toolchain}}
-
-arch = {{arch}}
 cpu = {{cpu}}
-
-target_extra_cflags ={% for flag in extra_cflags %} {{flag}}{% endfor %}
+architecture = {{architecture}}
+{% if extra_cflags %}
+chip_extra_cflags ={% for flag in extra_cflags %} {{flag}}{% endfor %}
+{% endif %}
+include $include_dir/architectures/$architecture/architecture.ninja

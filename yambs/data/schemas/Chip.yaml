@@ -1,13 +1,10 @@
 ---
 type: object
 additionalProperties: false
-required: [arch, cpu]
+required: [architecture, cpu]
 
 properties:
-  toolchain:
-    type: string
-    default: arm-picolibc-eabi
-  arch:
+  architecture:
     type: string
   cpu:
     type: string
