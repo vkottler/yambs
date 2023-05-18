@@ -4,4 +4,4 @@ boards:
     chip: xmc4700-2048
 
   - name: grand_central
-    chip: atsamd51-1024
+    chip: atsamd51x20
