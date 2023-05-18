@@ -16,7 +16,3 @@ chips:
     cpu: cortex-m4
     linker:
       symbols: {}
-
-architectures:
-  armv7e-m+fp:
-    extra_cflags: [-mfpu=auto -mfloat-abi=hard]

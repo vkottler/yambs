@@ -48,17 +48,26 @@ def write_link_line(
 
     # Add an hex target.
     hex_path = f"$build_dir/{source.with_suffix('.hex')}"
-    stream.write(f"build {hex_path}: hex {elf}" + linesep + linesep)
+    stream.write(f"build {hex_path}: hex {elf}" + linesep)
 
     # Add an objdump target.
     dump_path = f"$build_dir/{source.with_suffix('.dump')}"
-    stream.write(f"build {dump_path}: dump {elf}" + linesep + linesep)
+    stream.write(f"build {dump_path}: dump {elf}" + linesep)
+
+    # Add a uf2 target.
+    uf2_path = f"$build_dir/{source.with_suffix('.uf2')}"
+    stream.write(f"build {uf2_path}: uf2 {hex_path}" + linesep + linesep)
 
 
 def write_phony(stream: TextIO, app_srcs: Set[Path], base: Path) -> None:
     """Write the phony target."""
 
-    phonies = [("apps", ".bin"), ("hexs", ".hex"), ("dumps", ".dump")]
+    phonies = [
+        ("apps", ".bin"),
+        ("hexs", ".hex"),
+        ("dumps", ".dump"),
+        ("uf2s", ".uf2"),
+    ]
 
     if app_srcs:
         for phony, suffix in phonies:

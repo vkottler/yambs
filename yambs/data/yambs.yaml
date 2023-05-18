@@ -1,0 +1,10 @@
+---
+includes:
+  - includes/chips.yaml
+
+architectures:
+  armv7e-m+fp:
+    extra_cflags: [-mfpu=auto -mfloat-abi=hard]
+
+toolchains:
+  arm-picolibc-eabi: {}
