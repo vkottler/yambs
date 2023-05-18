@@ -51,5 +51,8 @@ def load(path: Pathlike) -> Config:
                 src_config, includes_key="includes", require_success=True
             ).data,
             _ARBITER.decode(path, includes_key="includes").data,
+            # Always allow the project-specific configuration to override
+            # package data.
+            expect_overwrite=True,
         )
     )

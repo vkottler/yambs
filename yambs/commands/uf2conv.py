@@ -65,6 +65,7 @@ def uf2conv_cmd(args: argparse.Namespace) -> int:
             ext = "h"
         else:
             outbuf = uf2.convert_to_uf2(inpbuf)
+
         if not args.deploy and not args.info:
             print(
                 (
@@ -75,11 +76,12 @@ def uf2conv_cmd(args: argparse.Namespace) -> int:
         if args.convert or ext != "uf2":
             if args.output is None:  # pragma: nocover
                 args.output = "flash." + ext
+
         if args.output:
             uf2.write_file(args.output, outbuf)
-        if (
-            ext == "uf2" and not args.convert and not args.info
-        ):  # pragma: nocover
+
+        # Deploy the file (if specified).
+        if ext == "uf2" and args.deploy:  # pragma: nocover
             drives = uf2.get_drives()
             if len(drives) == 0:
                 if args.wait:
