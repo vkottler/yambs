@@ -8,4 +8,4 @@ include $include_dir/rules.ninja
 include $include_dir/boards/$board/sources.ninja
 include $include_dir/boards/$board/apps.ninja
 
-build $board: phony{% for task in targets %} {{task}}{% endfor %}
+build $board: phony{% for task in targets %} {{name}}_{{task}}{% endfor %}
