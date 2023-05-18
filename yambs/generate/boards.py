@@ -28,7 +28,13 @@ def is_source(path: Path) -> bool:
 
 
 def add_dir(
-    stream: TextIO, paths: Set[Path], path: Path, comment: str, base: Path
+    stream: TextIO,
+    paths: Set[Path],
+    path: Path,
+    comment: str,
+    base: Path,
+    current_sources: Set[Path],
+    board: str = None,
 ) -> None:
     """Add a directory to set of paths."""
 
@@ -37,8 +43,11 @@ def add_dir(
         stream.write(linesep + f"# {comment}." + linesep)
         for item in path.iterdir():
             if is_source(item):
-                write_source_line(stream, item, base)
-                paths.add(item)
+                paths.add(
+                    write_source_line(
+                        stream, item, base, current_sources, board=board
+                    )
+                )
 
 
 def create_paths_dict(
@@ -58,12 +67,17 @@ def create_paths_dict(
 
 
 def write_sources(
-    stream: TextIO, board: Dict[str, Any], config: Config, src_root: Path
+    stream: TextIO,
+    board: Dict[str, Any],
+    config: Config,
+    src_root: Path,
+    global_sources: Set[Path],
 ) -> Tuple[Set[Path], Set[Path]]:
     """Write the source-file manifest."""
 
     # Add regular sources.
     all_srcs: Set[Path] = set()
+
     for kind, path in create_paths_dict(src_root, board, config).items():
         add_dir(
             stream,
@@ -71,6 +85,7 @@ def write_sources(
             path,
             f"{kind} sources",
             src_root,
+            global_sources,
         )
 
     # Add application sources.
@@ -79,7 +94,13 @@ def write_sources(
         src_root.joinpath("apps"), board, config
     ).items():
         add_dir(
-            stream, app_srcs, path, f"{kind} application sources", src_root
+            stream,
+            app_srcs,
+            path,
+            f"{kind} application sources",
+            src_root,
+            global_sources,
+            board=board["name"],
         )
 
     return all_srcs, app_srcs
@@ -96,6 +117,11 @@ def generate(jinja: Environment, ninja_root: Path, config: Config) -> None:
 
     # Render board top-level files.
     board: Dict[str, Any] = {}
+
+    # Keep track of all overall sources, so that no duplicate rules are
+    # generated.
+    global_sources: Set[Path] = set()
+
     for board in config.data["boards"]:  # type: ignore
         board_root = ninja_root.joinpath("boards", board["name"])
         board_root.mkdir(parents=True, exist_ok=True)
@@ -106,7 +132,7 @@ def generate(jinja: Environment, ninja_root: Path, config: Config) -> None:
             path_fd.write(f"src_dir = {config.data['src_root']}" + linesep)
 
             all_srcs, app_srcs = write_sources(
-                path_fd, board, config, src_root
+                path_fd, board, config, src_root, global_sources
             )
 
         print(
@@ -123,4 +149,4 @@ def generate(jinja: Environment, ninja_root: Path, config: Config) -> None:
 
             # Write the phony target.
             path_fd.write("# A target to build all applications." + linesep)
-            write_phony(path_fd, app_srcs, src_root)
+            write_phony(path_fd, app_srcs, src_root, board["name"])

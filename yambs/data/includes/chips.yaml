@@ -1,0 +1,51 @@
+---
+chips:
+  # Memory Map (Reference Manual sect. 7.3, p. 370):
+  #
+  # 24 MHz clock (default), 144 MHz max.
+  #
+  # - BROM (PMU ROM)       0x 0000 0000 (0x      4000,  16 Kb)
+  # - PMU/FLASH (cached)   0x 0800 0000 (0x   20 0000,   2 Mb)
+  # - PMU/FLASH (uncached) 0x 0C00 0000
+  # - PSRAM (code)         0x 1FFE 8000 (0x    1 8000,  96 Kb)
+  # - DSRAM1 (system)      0x 2000 0000 (0x    2 0000, 128 Kb)
+  # - DSRAM2 (comm)        0x 2002 0000 (0x    2 0000, 128 Kb)
+  #
+  # See p. 2825 for a flow diagram for startup modes.
+  xmc4700-2048:
+    architecture: armv7e-m+fp
+    cpu: cortex-m4
+    jlink: XMC4700-2048
+    linker:
+      symbols:
+        __flash: "0x08000000"
+        __flash_size: "0x00200000"
+        __ram: "0x20000000"
+        __ram_size: "0x00020000"
+        __stack_size: "1k"
+
+  # Memory Map (Data Sheet sect. 9.2 p. 53):
+  #
+  # 48 MHz clock (default), 120 MHz max.
+  #
+  # - Embedded Flash      0x 0000 0000 (  1 Mb)
+  # - Embedded SRAM       0x 2000 0000 (256 Kb)
+  # - Peripheral Bridge A 0x 4000 0000 ( 16 Kb)
+  # - Peripheral Bridge B 0x 4100 0000 ( 16 Kb)
+  # - Peripheral Bridge C 0x 4200 0000 ( 16 Kb)
+  # - Peripheral Bridge D 0x 4300 0000 ( 16 Kb)
+  # - Backup SRAM         0x 4700 0000 (  8 Kb)
+  # - NVM User Row        0x 0080 4000 (512  b)
+  #
+  # See p. 46 for a power domain block diagram.
+  atsamd51x20:
+    architecture: armv7e-m+fp
+    cpu: cortex-m4
+    jlink: ATSAMD51P20A
+    linker:
+      symbols:
+        __flash: "0x00000000"
+        __flash_size: "0x00100000"
+        __ram: "0x20000000"
+        __ram_size: "0x00040000"
+        __stack_size: "1k"

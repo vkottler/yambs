@@ -15,14 +15,14 @@ from vcorelib.args import CommandFunction as _CommandFunction
 
 # internal
 from yambs import PKG_NAME
-from yambs.config import Config
+from yambs.config import load
 from yambs.generate import generate
 
 
 def gen_cmd(args: _Namespace) -> int:
     """Execute the gen command."""
 
-    config = Config.decode(args.config, includes_key="includes")
+    config = load(args.config)
 
     config.root = args.dir
     config.root.mkdir(parents=True, exist_ok=True)

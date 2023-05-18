@@ -17,4 +17,4 @@ properties:
 
   targets:
     type: array
-    default: [apps, dumps, hexs]
+    default: [apps, dumps, hexs, uf2s]

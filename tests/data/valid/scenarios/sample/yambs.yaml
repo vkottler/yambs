@@ -1,7 +1,3 @@
 ---
 includes:
   - yambs/boards.yaml
-  - yambs/chips.yaml
-
-toolchains:
-  arm-picolibc-eabi: {}
