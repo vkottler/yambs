@@ -310,8 +310,10 @@ def convert_from_uf2(
         if datalen > 476:  # pragma: nocover
             assert False, f"Invalid UF2 data size at {ptr}"
         newaddr = header[3]
+
         if (header[2] & 0x2000) and (currfamilyid is None):
             currfamilyid = header[7]
+
         if curraddr is None or (
             (header[2] & 0x2000) and header[7] != currfamilyid
         ):
@@ -347,12 +349,15 @@ def convert_from_uf2(
                     families_found[header[7]] = newaddr
             else:
                 families_found[header[7]] = newaddr
+
         if prev_flag is None:
             prev_flag = header[2]
         if prev_flag != header[2]:  # pragma: nocover
             all_flags_same = False
+
         if blockno == (numblocks - 1):
             print("--- UF2 File Header Info ---")
+
             families = load_families()
             for family_hex, data in families_found.items():
                 family_short_name = ""
