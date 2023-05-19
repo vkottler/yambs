@@ -4,6 +4,7 @@ A module implementing a configuration interface for the package.
 
 # built-in
 from pathlib import Path
+from typing import Any, Dict, Iterator, Tuple
 
 # third-party
 from vcorelib.dict import merge
@@ -14,11 +15,14 @@ from vcorelib.paths import Pathlike, find_file
 
 # internal
 from yambs import PKG_NAME
+from yambs.config.board import Board
 from yambs.schemas import YambsDictCodec as _YambsDictCodec
 
 
 class Config(_YambsDictCodec, _BasicDictCodec):
     """The top-level configuration object for the package."""
+
+    data: Dict[str, Any]
 
     def init(self, data: _JsonObject) -> None:
         """Initialize this instance."""
@@ -37,6 +41,14 @@ class Config(_YambsDictCodec, _BasicDictCodec):
             name_root.mkdir(parents=True, exist_ok=True)
 
         return name_root
+
+    def boards(self) -> Iterator[Tuple[Board, Dict[str, Any]]]:
+        """Iterate over boards."""
+
+        for board in self.data["boards"]:
+            yield Board.from_dict(
+                board, self.data["architectures"], self.data["chips"]
+            ), board
 
 
 def load(path: Pathlike) -> Config:

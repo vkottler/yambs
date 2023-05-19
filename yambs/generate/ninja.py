@@ -7,23 +7,29 @@ from os import linesep
 from pathlib import Path
 from typing import Set, TextIO
 
+# internal
+from yambs.config.board import Board
+
 
 def write_source_line(
     stream: TextIO,
     source: Path,
     base: Path,
     current_sources: Set[Path],
-    board: str = None,
+    board: Board,
+    is_app_entry: bool = False,
 ) -> Path:
     """Write a ninja configuration line for a source file."""
 
     dest = source
-    if board is not None:
-        dest = source.parent.joinpath(board, source.name)
+    if is_app_entry:
+        dest = source.parent.joinpath(board.name, source.name)
+
+    build_loc = board.build.joinpath(dest)
 
     # Don't generate any duplicate compilation rules.
-    if dest not in current_sources:
-        current_sources.add(dest)
+    if build_loc not in current_sources:
+        current_sources.add(build_loc)
 
         stream.write(
             (

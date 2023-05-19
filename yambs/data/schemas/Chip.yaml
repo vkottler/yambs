@@ -17,7 +17,10 @@ properties:
 
   # The '-device' argument for use with the Segger J-Link.
   jlink:
-    type: string
+    type: array
+    default: []
+    items:
+      type: string
 
   linker:
     type: object

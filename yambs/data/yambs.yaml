@@ -3,6 +3,7 @@ includes:
   - includes/chips.yaml
 
 architectures:
+  armv6-m: {}
   armv7e-m+fp:
     extra_cflags: [-mfpu=auto -mfloat-abi=hard]
 
