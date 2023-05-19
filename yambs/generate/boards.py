@@ -40,7 +40,7 @@ def add_dir(
     base: Path,
     current_sources: Set[Path],
     board: Board,
-    is_app_entry: bool = False,
+    board_specific: bool = False,
 ) -> None:
     """Add a directory to set of paths."""
 
@@ -56,7 +56,7 @@ def add_dir(
                         base,
                         current_sources,
                         board,
-                        is_app_entry=is_app_entry,
+                        board_specific=board_specific,
                     )
                 )
 
@@ -122,7 +122,9 @@ def write_sources(
             src_root,
             global_sources,
             board,
-            is_app_entry=True,
+            # Avoid having a redundant directory in the path when the source
+            # directory is already the board-specific one.
+            board_specific="boards" not in str(path),
         )
 
     return all_srcs, app_srcs

@@ -17,12 +17,12 @@ def write_source_line(
     base: Path,
     current_sources: Set[Path],
     board: Board,
-    is_app_entry: bool = False,
+    board_specific: bool = False,
 ) -> Path:
     """Write a ninja configuration line for a source file."""
 
     dest = source
-    if is_app_entry:
+    if board_specific:
         dest = source.parent.joinpath(board.name, source.name)
 
     build_loc = board.build.joinpath(dest)
