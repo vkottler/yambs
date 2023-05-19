@@ -33,6 +33,6 @@ rule dump
   command = ${toolchain_prefix}objdump -D $in > $out
 
 rule uf2
-  command = mbs uf2conv -o $out $in
+  command = mbs uf2conv $uf2conv_args -o $out $in
 
 build_dir = {{build_root}}/$toolchain/$architecture/$cpu

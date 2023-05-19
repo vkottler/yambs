@@ -1,10 +1,17 @@
 board = {{name}}
 chip = {{chip}}
 {% if extra_cflags %}
+
 board_extra_cflags ={% for flag in extra_cflags %} {{flag}}{% endfor %}
+
+{% endif %}
+{% if uf2_family %}
+
+uf2conv_args = -f {{uf2_family}}
 {% endif %}
 
 board_ldflags ={% for flag in ldflags %} {{flag}}{% endfor %}
+
 
 include $include_dir/rules.ninja
 include $include_dir/boards/$board/sources.ninja
