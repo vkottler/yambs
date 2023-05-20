@@ -6,6 +6,7 @@ chips:
     architecture: armv7e-m+fp
     cpu: cortex-m4
     jlink: [ATSAMD51P20A]
+    uf2_family: SAMD51
     linker:
       symbols:
         # Memory Map (Data Sheet sect. 9.2 p. 53):

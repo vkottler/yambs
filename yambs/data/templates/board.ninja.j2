@@ -5,10 +5,6 @@ chip = {{chip}}
 board_extra_cflags ={% for flag in extra_cflags %} {{flag}}{% endfor %}
 
 {% endif %}
-{% if uf2_family %}
-
-uf2conv_args = -f {{uf2_family}}
-{% endif %}
 
 board_ldflags ={% for flag in ldflags %} {{flag}}{% endfor %}
 

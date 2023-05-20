@@ -9,6 +9,10 @@ properties:
   cpu:
     type: string
 
+  uf2_family:
+    type: string
+    default: ""
+
   extra_cflags:
     type: array
     default: []
