@@ -2,11 +2,11 @@
     =====================================
     generator=datazen
     version=3.1.2
-    hash=ef7f414918ad82f1abad57ff15edbd1b
+    hash=8ce3ed1dcaa2a9870cee9cc7a0216adf
     =====================================
 -->
 
-# yambs ([1.3.1](https://pypi.org/project/yambs/))
+# yambs ([1.4.0](https://pypi.org/project/yambs/))
 
 [![python](https://img.shields.io/pypi/pyversions/yambs.svg)](https://pypi.org/project/yambs/)
 ![Build Status](https://github.com/vkottler/yambs/workflows/Python%20Package/badge.svg)
