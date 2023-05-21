@@ -61,6 +61,6 @@ properties:
 
   common_cflags:
     type: array
-    default: [-Wall, -Werror, -g]
+    default: [-Wall, -g]
     items:
       type: string

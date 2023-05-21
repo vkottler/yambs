@@ -5,6 +5,7 @@ A module for generating templated outputs.
 # third-party
 from datazen.templates import environment
 from jinja2 import FileSystemLoader
+from vcorelib.io import ARBITER
 from vcorelib.paths import resource
 
 # internal
@@ -35,9 +36,13 @@ def generate(config: Config) -> None:
 
     # Generate all other files.
     for gen in [
-        generate_boards,
         generate_chips,
         generate_toolchains,
         generate_architectures,
     ]:
         gen(jinja, ninja_root, config)
+
+    ARBITER.encode(
+        ninja_root.joinpath("board_apps.json"),
+        generate_boards(jinja, ninja_root, config),
+    )

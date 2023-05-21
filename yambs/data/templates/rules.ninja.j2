@@ -20,10 +20,8 @@ rule cc
   deps = gcc
   command = $tool -MD -MF $out.d $cflags -c $in -o $out
 
-ldflags = -T$include_dir/chips/$chip/chip.ld
-
 rule link
-  command = $tool $cflags $ldflags -Wl,-Map=$out.map $in -o $out
+  command = $tool $cflags $board_ldflags -Wl,-Map=$out.map $in -o $out
 
 rule bin
   command = ${toolchain_prefix}objcopy -O binary $in $out
@@ -35,6 +33,6 @@ rule dump
   command = ${toolchain_prefix}objdump -D $in > $out
 
 rule uf2
-  command = mbs uf2conv -o $out $in
+  command = mbs uf2conv $uf2conv_args -o $out $in
 
 build_dir = {{build_root}}/$toolchain/$architecture/$cpu

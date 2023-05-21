@@ -9,6 +9,10 @@ properties:
   cpu:
     type: string
 
+  uf2_family:
+    type: string
+    default: ""
+
   extra_cflags:
     type: array
     default: []
@@ -17,7 +21,10 @@ properties:
 
   # The '-device' argument for use with the Segger J-Link.
   jlink:
-    type: string
+    type: array
+    default: []
+    items:
+      type: string
 
   linker:
     type: object
