@@ -2,6 +2,9 @@
 A module for generating templated outputs.
 """
 
+# built-in
+from typing import Any, Dict
+
 # third-party
 from datazen.templates import environment
 from jinja2 import FileSystemLoader
@@ -39,10 +42,21 @@ def generate(config: Config) -> None:
         generate_chips,
         generate_toolchains,
         generate_architectures,
+        generate_boards,
     ]:
         gen(jinja, ninja_root, config)
 
+    board_apps: Dict[str, Any] = {}
+
+    # Ensure that the build root directory is present in the full output paths
+    # for built applications.
+    for board in config.board_data:
+        board_apps[board.name] = {
+            short: str(config.build_root.joinpath(path))
+            for short, path in board.apps.items()
+        }
+
     ARBITER.encode(
         ninja_root.joinpath("board_apps.json"),
-        generate_boards(jinja, ninja_root, config),
+        board_apps,
     )

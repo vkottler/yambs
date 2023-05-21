@@ -128,16 +128,14 @@ def generate(
     jinja: Environment,
     ninja_root: Path,
     config: Config,
-) -> Dict[str, Any]:
+) -> None:
     """Generate board-related ninja files."""
-
-    board_apps: Dict[str, Any] = {}
 
     # Render the board manifest and rules file.
     for template in ["all.ninja", "rules.ninja"]:
         render_template(jinja, ninja_root, template, config.data)
 
-    src_root = rel(config.directory("src_root"))
+    src_root = rel(config.src_root)
 
     # Keep track of all overall sources, so that no duplicate rules are
     # generated.
@@ -163,16 +161,11 @@ def generate(
             len(app_srcs),
         )
 
-        # Keep track of each board's applications.
-        board_apps[board.name] = list(str(x) for x in app_srcs)
-
         # Write the application manifest.
         with board_root.joinpath("apps.ninja").open("w") as path_fd:
             for app_src in app_srcs:
-                write_link_line(path_fd, app_src, all_srcs, src_root)
+                write_link_line(path_fd, app_src, all_srcs, src_root, board)
 
             # Write the phony target.
             path_fd.write("# A target to build all applications." + linesep)
             write_phony(path_fd, app_srcs, src_root, board.name)
-
-    return board_apps

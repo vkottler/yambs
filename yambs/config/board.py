@@ -54,6 +54,7 @@ class Board(NamedTuple):
     extra_cflags: List[str]
     targets: List[str]
     extra_dirs: List[str]
+    apps: Dict[str, Path]
 
     @property
     def build(self) -> Path:
@@ -79,4 +80,5 @@ class Board(NamedTuple):
             data["extra_cflags"],
             data["targets"],
             data["extra_dirs"],
+            {},
         )

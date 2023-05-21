@@ -49,7 +49,7 @@ def write_continuation(stream: TextIO, offset: str) -> None:
 
 
 def write_link_line(
-    stream: TextIO, source: Path, all_srcs: Set[Path], base: Path
+    stream: TextIO, source: Path, all_srcs: Set[Path], base: Path, board: Board
 ) -> None:
     """
     Write a ninja configuration line for an application requiring linking.
@@ -57,10 +57,15 @@ def write_link_line(
 
     source = source.relative_to(base)
 
-    elf = f"$build_dir/{source.with_suffix('.elf')}"
+    by_suffix = {
+        x: source.with_suffix(f".{x}")
+        for x in ["o", "elf", "bin", "hex", "dump", "uf2"]
+    }
+
+    elf = f"$build_dir/{by_suffix['elf']}"
     line = f"build {elf}: link "
     offset = " " * len(line)
-    stream.write(line + f"$build_dir/{source.with_suffix('.o')}")
+    stream.write(line + f"$build_dir/{by_suffix['o']}")
 
     for src in all_srcs:
         write_continuation(stream, offset)
@@ -68,20 +73,23 @@ def write_link_line(
     stream.write(linesep)
 
     # Add lines for creating binaries.
-    bin_path = f"$build_dir/{source.with_suffix('.bin')}"
-    stream.write(f"build {bin_path}: bin {elf}" + linesep)
-
-    # Add an hex target.
-    hex_path = f"$build_dir/{source.with_suffix('.hex')}"
-    stream.write(f"build {hex_path}: hex {elf}" + linesep)
+    stream.write(f"build $build_dir/{by_suffix['bin']}: bin {elf}" + linesep)
 
     # Add an objdump target.
-    dump_path = f"$build_dir/{source.with_suffix('.dump')}"
-    stream.write(f"build {dump_path}: dump {elf}" + linesep)
+    stream.write(f"build $build_dir/{by_suffix['dump']}: dump {elf}" + linesep)
+
+    # Add an hex target.
+    hex_path = f"$build_dir/{by_suffix['hex']}"
+    stream.write(f"build {hex_path}: hex {elf}" + linesep)
 
     # Add a uf2 target.
-    uf2_path = f"$build_dir/{source.with_suffix('.uf2')}"
-    stream.write(f"build {uf2_path}: uf2 {hex_path}" + linesep + linesep)
+    stream.write(f"build $build_dir/{by_suffix['uf2']}: uf2 {hex_path}")
+
+    stream.write(linesep + linesep)
+
+    # Add this application to the board's data structure.
+    out = by_suffix["elf"].with_suffix("")
+    board.apps[str(out)] = board.build.joinpath(out)
 
 
 def write_phony(

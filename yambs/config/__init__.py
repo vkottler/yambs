@@ -4,7 +4,7 @@ A module implementing a configuration interface for the package.
 
 # built-in
 from pathlib import Path
-from typing import Any, Dict, Iterator, Tuple
+from typing import Any, Dict, Iterator, List, Tuple
 
 # third-party
 from vcorelib.dict import merge
@@ -23,12 +23,25 @@ class Config(_YambsDictCodec, _BasicDictCodec):
     """The top-level configuration object for the package."""
 
     data: Dict[str, Any]
+    board_data: List[Board]
 
     def init(self, data: _JsonObject) -> None:
         """Initialize this instance."""
 
         self.data = data
         self.root = Path()
+        self._init_boards()
+
+        self.src_root = self.directory("src_root")
+        self.build_root = self.directory("build_root")
+
+    def _init_boards(self) -> None:
+        """Initialize board data."""
+
+        self.board_data = [
+            Board.from_dict(x, self.data["architectures"], self.data["chips"])
+            for x in self.data["boards"]
+        ]
 
     def directory(self, name: str, mkdir: bool = True) -> Path:
         """Get a configurable directory."""
@@ -45,10 +58,8 @@ class Config(_YambsDictCodec, _BasicDictCodec):
     def boards(self) -> Iterator[Tuple[Board, Dict[str, Any]]]:
         """Iterate over boards."""
 
-        for board in self.data["boards"]:
-            yield Board.from_dict(
-                board, self.data["architectures"], self.data["chips"]
-            ), board
+        for inst, board in zip(self.board_data, self.data["boards"]):
+            yield inst, board
 
 
 DEFAULT_CONFIG = f"{PKG_NAME}.yaml"
