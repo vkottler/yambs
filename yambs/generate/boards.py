@@ -3,6 +3,7 @@ A module for generating board-related files.
 """
 
 # built-in
+from logging import getLogger
 from os import linesep
 from pathlib import Path
 from typing import Any, Dict, Set, TextIO, Tuple
@@ -14,22 +15,14 @@ from vcorelib.paths import rel
 # internal
 from yambs.config import Config
 from yambs.config.board import Board
-from yambs.generate.common import render_template
+from yambs.generate.common import is_source, render_template
 from yambs.generate.ninja import (
     write_link_line,
     write_phony,
     write_source_line,
 )
 
-
-def is_source(path: Path) -> bool:
-    """Determine if a file is a source file."""
-
-    return (
-        path.name.endswith(".c")
-        or path.name.endswith(".cc")
-        or path.name.endswith(".S")
-    )
+LOG = getLogger(__name__)
 
 
 def add_dir(
@@ -44,7 +37,8 @@ def add_dir(
 ) -> None:
     """Add a directory to set of paths."""
 
-    print(f"{comment}: checking '{path}' for sources.")
+    LOG.debug("%s: checking '%s' for sources.", comment, path)
+
     if path.is_dir():
         stream.write(linesep + f"# {comment}." + linesep)
         for item in path.iterdir():
@@ -130,8 +124,14 @@ def write_sources(
     return all_srcs, app_srcs
 
 
-def generate(jinja: Environment, ninja_root: Path, config: Config) -> None:
+def generate(
+    jinja: Environment,
+    ninja_root: Path,
+    config: Config,
+) -> Dict[str, Any]:
     """Generate board-related ninja files."""
+
+    board_apps: Dict[str, Any] = {}
 
     # Render the board manifest and rules file.
     for template in ["all.ninja", "rules.ninja"]:
@@ -156,12 +156,15 @@ def generate(jinja: Environment, ninja_root: Path, config: Config) -> None:
                 path_fd, board, src_root, global_sources
             )
 
-        print(
-            (
-                f"({board.name}) Found {len(all_srcs)} "
-                f"sources and {len(app_srcs)} applications."
-            )
+        LOG.info(
+            "(%s) Found %d sources and %d applications.",
+            board.name,
+            len(all_srcs),
+            len(app_srcs),
         )
+
+        # Keep track of each board's applications.
+        board_apps[board.name] = list(str(x) for x in app_srcs)
 
         # Write the application manifest.
         with board_root.joinpath("apps.ninja").open("w") as path_fd:
@@ -171,3 +174,5 @@ def generate(jinja: Environment, ninja_root: Path, config: Config) -> None:
             # Write the phony target.
             path_fd.write("# A target to build all applications." + linesep)
             write_phony(path_fd, app_srcs, src_root, board.name)
+
+    return board_apps

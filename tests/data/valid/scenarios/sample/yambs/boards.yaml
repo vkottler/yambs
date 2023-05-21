@@ -5,3 +5,6 @@ boards:
 
   - name: grand_central
     chip: atsamd51x20
+    extra_dirs:
+      - lib1
+      - lib2
