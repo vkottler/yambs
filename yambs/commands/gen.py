@@ -15,14 +15,14 @@ from vcorelib.args import CommandFunction as _CommandFunction
 
 # internal
 from yambs import PKG_NAME
-from yambs.config import load
+from yambs.config import DEFAULT_CONFIG, load
 from yambs.generate import generate
 
 
 def gen_cmd(args: _Namespace) -> int:
     """Execute the gen command."""
 
-    config = load(args.config)
+    config = load(path=args.config)
 
     config.root = args.dir
     config.root.mkdir(parents=True, exist_ok=True)
@@ -60,7 +60,7 @@ def add_gen_cmd(parser: _ArgumentParser) -> _CommandFunction:
         "-c",
         "--config",
         type=_Path,
-        default=f"{PKG_NAME}.yaml",
+        default=DEFAULT_CONFIG,
         help=(
             "the path to the top-level configuration "
             "file (default: '%(default)s')"

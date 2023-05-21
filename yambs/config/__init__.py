@@ -51,10 +51,13 @@ class Config(_YambsDictCodec, _BasicDictCodec):
             ), board
 
 
-def load(path: Pathlike) -> Config:
+DEFAULT_CONFIG = f"{PKG_NAME}.yaml"
+
+
+def load(path: Pathlike = DEFAULT_CONFIG) -> Config:
     """Load a configuration."""
 
-    src_config = find_file(f"{PKG_NAME}.yaml", package=PKG_NAME)
+    src_config = find_file(DEFAULT_CONFIG, package=PKG_NAME)
     assert src_config is not None
 
     return Config.create(
