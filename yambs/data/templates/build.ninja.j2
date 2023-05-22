@@ -6,4 +6,10 @@ common_cflags = -I{{src_root}}{% for flag in common_cflags %} {{flag}}{% endfor 
 
 include $include_dir/all.ninja
 
+rule compile_commands
+  command = ninja -t compdb > compile_commands.json
+build compdb: compile_commands
+
+build all: phony all_boards compdb
+
 default {{default_target}}
