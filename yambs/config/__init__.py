@@ -24,12 +24,14 @@ class Config(_YambsDictCodec, _BasicDictCodec):
 
     data: Dict[str, Any]
     board_data: List[Board]
+    boards_by_name: Dict[str, Board]
 
     def init(self, data: _JsonObject) -> None:
         """Initialize this instance."""
 
         self.data = data
         self.root = Path()
+        self.boards_by_name = {}
         self._init_boards()
 
         self.src_root = self.directory("src_root")
@@ -42,6 +44,8 @@ class Config(_YambsDictCodec, _BasicDictCodec):
             Board.from_dict(x, self.data["architectures"], self.data["chips"])
             for x in self.data["boards"]
         ]
+        for board in self.board_data:
+            self.boards_by_name[board.name] = board
 
     def directory(self, name: str, mkdir: bool = True) -> Path:
         """Get a configurable directory."""

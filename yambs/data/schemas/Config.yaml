@@ -61,6 +61,12 @@ properties:
 
   common_cflags:
     type: array
-    default: [-Wall, -g]
+    default: [-Wall, -g, -ffunction-sections]
+    items:
+      type: string
+
+  common_ldflags:
+    type: array
+    default: ["-Wl,--gc-sections"]
     items:
       type: string

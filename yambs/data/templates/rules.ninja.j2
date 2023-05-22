@@ -20,8 +20,11 @@ rule cc
   deps = gcc
   command = $tool -MD -MF $out.d $cflags -c $in -o $out
 
+ldflags = $board_ldflags{% for flag in common_ldflags %} {{flag}}{% endfor %}
+
+
 rule link
-  command = $tool $cflags $board_ldflags -Wl,-Map=$out.map $in -o $out
+  command = $tool $cflags $ldflags -Wl,-Map=$out.map $in -o $out
 
 rule bin
   command = ${toolchain_prefix}objcopy -O binary $in $out
