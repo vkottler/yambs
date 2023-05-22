@@ -36,7 +36,7 @@ properties:
 
   default_target:
     type: string
-    default: all_boards
+    default: all
 
   ninja_out:
     type: string
