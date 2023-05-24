@@ -4,6 +4,12 @@ includes:
   - microchip.yaml
 
 chips:
+  native:
+    architecture: native
+    cpu: native
+    linker:
+      symbols: {}
+
   # 133 MHz max.
   rp2040:
     architecture: armv6-m
