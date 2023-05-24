@@ -11,7 +11,7 @@ from vcorelib.dict import merge
 from vcorelib.dict.codec import BasicDictCodec as _BasicDictCodec
 from vcorelib.io import ARBITER as _ARBITER
 from vcorelib.io.types import JsonObject as _JsonObject
-from vcorelib.paths import Pathlike, find_file
+from vcorelib.paths import Pathlike, find_file, normalize
 
 # internal
 from yambs import PKG_NAME
@@ -23,6 +23,7 @@ class Config(_YambsDictCodec, _BasicDictCodec):
     """The top-level configuration object for the package."""
 
     data: Dict[str, Any]
+    root: Path
     board_data: List[Board]
     boards_by_name: Dict[str, Board]
 
@@ -69,13 +70,13 @@ class Config(_YambsDictCodec, _BasicDictCodec):
 DEFAULT_CONFIG = f"{PKG_NAME}.yaml"
 
 
-def load(path: Pathlike = DEFAULT_CONFIG) -> Config:
+def load(path: Pathlike = DEFAULT_CONFIG, root: Pathlike = None) -> Config:
     """Load a configuration."""
 
     src_config = find_file(DEFAULT_CONFIG, package=PKG_NAME)
     assert src_config is not None
 
-    return Config.create(
+    result = Config.create(
         merge(
             _ARBITER.decode(
                 src_config, includes_key="includes", require_success=True
@@ -86,3 +87,9 @@ def load(path: Pathlike = DEFAULT_CONFIG) -> Config:
             expect_overwrite=True,
         )
     )
+
+    if root is not None:
+        result.root = normalize(root)
+        result.root.mkdir(parents=True, exist_ok=True)
+
+    return result
