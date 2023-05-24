@@ -10,3 +10,18 @@ properties:
   c_standard:
     type: string
     default: gnu17
+
+  root:
+    type: string
+    default: "./toolchains/$toolchain/out/bin"
+
+  # If set, overrides any other toolchain pathing or prefix construction.
+  prefix:
+    type: string
+    default: ""
+
+  extra_cflags:
+    type: array
+    default: []
+    items:
+      type: string

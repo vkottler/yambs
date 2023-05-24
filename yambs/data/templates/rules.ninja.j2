@@ -1,17 +1,11 @@
 include $include_dir/chips/$chip/chip.ninja
 include $include_dir/toolchains/$toolchain/toolchain.ninja
 
-cflags = $common_cflags -march=$architecture -mcpu=$cpu $
+cflags = $common_cflags $
          $board_extra_cflags $
          $chip_extra_cflags $
          $architecture_extra_cflags $
          $toolchain_cflags
-
-{% if toolchain_prefix %}
-toolchain_prefix = {{toolchain_prefix}}
-{% else %}
-toolchain_prefix = {{toolchains_root}}/${toolchain}-
-{% endif %}
 
 tool = ${toolchain_prefix}{{cc}}
 
