@@ -48,7 +48,7 @@ SOURCES = {
 }
 
 
-@lru_cache
+@lru_cache(maxsize=None)
 def is_source(path: Path) -> Optional[SourceTranslator]:
     """Determine if a file is a source file."""
     return SOURCES.get(path.suffix)
