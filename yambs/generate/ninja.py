@@ -39,8 +39,14 @@ def write_source_line(
                 f"build {translator.output(dest.relative_to(base))}: "
                 f"{translator.rule} $src_dir/{source.relative_to(base)}"
             )
-            + linesep
         )
+
+        # Any regular source file depends on all of the boards generated
+        # depencencies.
+        if not translator.generated_header:
+            stream.write(" || ${board}_generated")
+
+        stream.write(linesep)
 
     return dest
 
@@ -72,17 +78,6 @@ def write_link_line(
     for src, trans in sources.link_sources():
         write_continuation(stream, offset)
         stream.write(str(trans.output(src.relative_to(base))))
-
-    # Check for any implicit dependencies (generated outputs).
-    implicit = list(sources.implicit_sources())
-    if implicit:
-        stream.write(
-            f" | {implicit[0][1].output(implicit[0][0].relative_to(base))}"
-        )
-        for src, trans in implicit[1:]:
-            write_continuation(stream, offset)
-            stream.write(str(trans.output(src.relative_to(base))))
-
     stream.write(linesep)
 
     # Add lines for creating binaries.
@@ -105,6 +100,28 @@ def write_link_line(
     board.apps[str(out)] = board.build.joinpath(out)
 
 
+def write_generated_phony(
+    stream: TextIO, sources: SourceSets, src_root: Path
+) -> None:
+    """Write generated-file phony target."""
+
+    # Write generated-file phony target.
+    stream.write("# A target to generate additional headers." + linesep)
+    phony_line = "build ${board}_generated: phony"
+    offset = " " * (len(phony_line) + 1)
+
+    stream.write(phony_line)
+
+    implicit = list(sources.implicit_sources())
+    if implicit:
+        src, trans = implicit[0]
+        stream.write(f" {trans.output(src.relative_to(src_root))}")
+        for src, trans in implicit[1:]:
+            write_continuation(stream, offset)
+            stream.write(str(trans.output(src.relative_to(src_root))))
+    stream.write(linesep + linesep)
+
+
 def write_link_lines(
     board_root: Path, src_root: Path, board: Board, sources: SourceSets
 ) -> None:
@@ -114,6 +131,8 @@ def write_link_lines(
     with board_root.joinpath("apps.ninja").open("w") as path_fd:
         for app_src in sources.apps:
             write_link_line(path_fd, app_src, src_root, board, sources)
+
+        write_generated_phony(path_fd, sources, src_root)
 
         # Write the phony target.
         path_fd.write("# A target to build all applications." + linesep)
