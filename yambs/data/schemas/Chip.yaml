@@ -40,5 +40,5 @@ properties:
             type: string
 
       include:
-        default: picolibc
+        default: picolibcpp
         type: string

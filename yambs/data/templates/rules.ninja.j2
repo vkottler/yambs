@@ -7,12 +7,17 @@ cflags = $common_cflags $
          $architecture_extra_cflags $
          $toolchain_cflags
 
-tool = ${toolchain_prefix}{{cc}}
-
 rule cc
   depfile = $out.d
   deps = gcc
-  command = $tool -MD -MF $out.d $cflags -c $in -o $out
+  command = ${toolchain_prefix}{{cc}} -MD -MF $out.d $cflags $
+            -std=$c_standard -c $in -o $out
+
+rule cxx
+  depfile = $out.d
+  deps = gcc
+  command = ${toolchain_prefix}{{cxx}} -MD -MF $out.d $cflags $
+            -std=$cxx_standard -c $in -o $out
 
 rule pio
   command = pioasm -o c-sdk $in $out
@@ -21,7 +26,7 @@ ldflags = $board_ldflags{% for flag in common_ldflags %} {{flag}}{% endfor %}
 
 
 rule link
-  command = $tool $cflags $ldflags -Wl,-Map=$out.map $in -o $out
+  command = ${toolchain_prefix}{{ld}} $cflags $ldflags -Wl,-Map=$out.map $in -o $out
 
 rule bin
   command = ${toolchain_prefix}objcopy -O binary $in $out
