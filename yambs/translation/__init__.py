@@ -43,7 +43,8 @@ DEFAULT = SourceTranslator()
 SOURCES = {
     ".c": DEFAULT,
     ".S": DEFAULT,
-    ".cc": DEFAULT,
+    ".cc": SourceTranslator(rule="cxx"),
+    ".cpp": SourceTranslator(rule="cxx"),
     ".pio": SourceTranslator("pio", ".h", Path("$generated_dir")),
 }
 

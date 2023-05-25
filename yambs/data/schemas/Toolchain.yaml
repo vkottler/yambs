@@ -5,11 +5,15 @@ additionalProperties: false
 properties:
   specs:
     type: string
-    default: picolibc
+    default: picolibcpp
 
   c_standard:
     type: string
     default: gnu17
+
+  cxx_standard:
+    type: string
+    default: gnu++20
 
   root:
     type: string
