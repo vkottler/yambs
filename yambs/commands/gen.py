@@ -16,24 +16,21 @@ from vcorelib.args import CommandFunction as _CommandFunction
 # internal
 from yambs import PKG_NAME
 from yambs.config import DEFAULT_CONFIG, load
+from yambs.environment import BuildEnvironment
 from yambs.generate import generate
 
 
 def gen_cmd(args: _Namespace) -> int:
     """Execute the gen command."""
 
-    config = load(path=args.config)
-
-    config.root = args.dir
-    config.root.mkdir(parents=True, exist_ok=True)
-
-    generate(config)
+    env = BuildEnvironment(load(path=args.config, root=args.dir))
+    generate(env)
 
     return (
         watch(
             WatchParams(
                 args.dir,
-                _Path(str(config.data["src_root"])),
+                _Path(str(env.config.data["src_root"])),
                 [
                     executable,
                     "-m",

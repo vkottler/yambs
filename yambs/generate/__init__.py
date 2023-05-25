@@ -13,7 +13,7 @@ from vcorelib.paths import resource
 
 # internal
 from yambs import PKG_NAME
-from yambs.config import Config
+from yambs.environment import BuildEnvironment
 from yambs.generate.architectures import generate as generate_architectures
 from yambs.generate.boards import generate as generate_boards
 from yambs.generate.chips import generate as generate_chips
@@ -21,7 +21,7 @@ from yambs.generate.common import render_template
 from yambs.generate.toolchains import generate as generate_toolchains
 
 
-def generate(config: Config) -> None:
+def generate(env: BuildEnvironment) -> None:
     """Generate ninja files."""
 
     templates_dir = resource("templates", package=PKG_NAME)
@@ -33,9 +33,7 @@ def generate(config: Config) -> None:
 
     # Render the top-level configuration. This is the only file that's
     # generated into the root directory.
-    render_template(jinja, config.root, "build.ninja", config.data)
-
-    ninja_root = config.directory("ninja_out")
+    render_template(jinja, env.config.root, "build.ninja", env.config.data)
 
     # Generate all other files.
     for gen in [
@@ -44,19 +42,19 @@ def generate(config: Config) -> None:
         generate_architectures,
         generate_boards,
     ]:
-        gen(jinja, ninja_root, config)
+        gen(jinja, env)
 
     board_apps: Dict[str, Any] = {}
 
     # Ensure that the build root directory is present in the full output paths
     # for built applications.
-    for board in config.board_data:
+    for board in env.config.board_data:
         board_apps[board.name] = {
-            short: str(config.build_root.joinpath(path))
+            short: str(env.config.build_root.joinpath(path))
             for short, path in board.apps.items()
         }
 
     ARBITER.encode(
-        ninja_root.joinpath("board_apps.json"),
+        env.ninja_root.joinpath("board_apps.json"),
         board_apps,
     )

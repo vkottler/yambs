@@ -56,6 +56,10 @@ class Board(NamedTuple):
     extra_dirs: List[str]
     apps: Dict[str, Path]
 
+    def __hash__(self) -> int:
+        """Get a hashing method for this instance."""
+        return hash(self.name)
+
     @property
     def build(self) -> Path:
         """Get a buld directory based on this board."""

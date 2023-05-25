@@ -14,6 +14,9 @@ rule cc
   deps = gcc
   command = $tool -MD -MF $out.d $cflags -c $in -o $out
 
+rule pio
+  command = pioasm -o c-sdk $in $out
+
 ldflags = $board_ldflags{% for flag in common_ldflags %} {{flag}}{% endfor %}
 
 
@@ -33,3 +36,4 @@ rule uf2
   command = mbs uf2conv $uf2conv_args -o $out $in
 
 build_dir = {{build_root}}/$toolchain/$architecture/$cpu
+generated_dir = $src_dir/generated

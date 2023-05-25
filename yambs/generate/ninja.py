@@ -9,6 +9,8 @@ from typing import Set, TextIO
 
 # internal
 from yambs.config.board import Board
+from yambs.environment import SourceSets
+from yambs.translation import SourceTranslator
 
 
 def write_source_line(
@@ -17,6 +19,7 @@ def write_source_line(
     base: Path,
     current_sources: Set[Path],
     board: Board,
+    translator: SourceTranslator,
     board_specific: bool = False,
 ) -> Path:
     """Write a ninja configuration line for a source file."""
@@ -33,12 +36,17 @@ def write_source_line(
 
         stream.write(
             (
-                f"build $build_dir/"
-                f"{dest.relative_to(base).with_suffix('.o')}: "
-                f"cc $src_dir/{source.relative_to(base)}"
+                f"build {translator.output(dest.relative_to(base))}: "
+                f"{translator.rule} $src_dir/{source.relative_to(base)}"
             )
-            + linesep
         )
+
+        # Any regular source file depends on all of the boards generated
+        # depencencies.
+        if not translator.generated_header:
+            stream.write(" || ${board}_generated")
+
+        stream.write(linesep)
 
     return dest
 
@@ -49,7 +57,7 @@ def write_continuation(stream: TextIO, offset: str) -> None:
 
 
 def write_link_line(
-    stream: TextIO, source: Path, all_srcs: Set[Path], base: Path, board: Board
+    stream: TextIO, source: Path, base: Path, board: Board, sources: SourceSets
 ) -> None:
     """
     Write a ninja configuration line for an application requiring linking.
@@ -67,9 +75,9 @@ def write_link_line(
     offset = " " * len(line)
     stream.write(line + f"$build_dir/{by_suffix['o']}")
 
-    for src in all_srcs:
+    for src, trans in sources.link_sources():
         write_continuation(stream, offset)
-        stream.write(f"$build_dir/{src.relative_to(base).with_suffix('.o')}")
+        stream.write(str(trans.output(src.relative_to(base))))
     stream.write(linesep)
 
     # Add lines for creating binaries.
@@ -90,6 +98,45 @@ def write_link_line(
     # Add this application to the board's data structure.
     out = by_suffix["elf"].with_suffix("")
     board.apps[str(out)] = board.build.joinpath(out)
+
+
+def write_generated_phony(
+    stream: TextIO, sources: SourceSets, src_root: Path
+) -> None:
+    """Write generated-file phony target."""
+
+    # Write generated-file phony target.
+    stream.write("# A target to generate additional headers." + linesep)
+    phony_line = "build ${board}_generated: phony"
+    offset = " " * (len(phony_line) + 1)
+
+    stream.write(phony_line)
+
+    implicit = list(sources.implicit_sources())
+    if implicit:
+        src, trans = implicit[0]
+        stream.write(f" {trans.output(src.relative_to(src_root))}")
+        for src, trans in implicit[1:]:
+            write_continuation(stream, offset)
+            stream.write(str(trans.output(src.relative_to(src_root))))
+    stream.write(linesep + linesep)
+
+
+def write_link_lines(
+    board_root: Path, src_root: Path, board: Board, sources: SourceSets
+) -> None:
+    """Write the application manifest and phony targets."""
+
+    # Write the application manifest.
+    with board_root.joinpath("apps.ninja").open("w") as path_fd:
+        for app_src in sources.apps:
+            write_link_line(path_fd, app_src, src_root, board, sources)
+
+        write_generated_phony(path_fd, sources, src_root)
+
+        # Write the phony target.
+        path_fd.write("# A target to build all applications." + linesep)
+        write_phony(path_fd, sources.apps, src_root, board.name)
 
 
 def write_phony(

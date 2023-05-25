@@ -2,22 +2,19 @@
 A module for generating chip-related files.
 """
 
-# built-in
-from pathlib import Path
-
 # third-party
 from jinja2 import Environment
 
 # internal
-from yambs.config import Config
+from yambs.environment import BuildEnvironment
 from yambs.generate.common import render_template
 
 
-def generate(jinja: Environment, ninja_root: Path, config: Config) -> None:
+def generate(jinja: Environment, env: BuildEnvironment) -> None:
     """Generate chip-related ninja files."""
 
-    for name, data in config.data["chips"].items():
-        chips_root = ninja_root.joinpath("chips", name)
+    for name, data in env.config.data["chips"].items():
+        chips_root = env.ninja_root.joinpath("chips", name)
         chips_root.mkdir(parents=True, exist_ok=True)
 
         # Render chip files and linker scripts.

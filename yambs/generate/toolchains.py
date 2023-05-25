@@ -2,22 +2,19 @@
 A module for generating toolchain-related files.
 """
 
-# built-in
-from pathlib import Path
-
 # third-party
 from jinja2 import Environment
 
 # internal
-from yambs.config import Config
+from yambs.environment import BuildEnvironment
 from yambs.generate.common import render_template
 
 
-def generate(jinja: Environment, ninja_root: Path, config: Config) -> None:
+def generate(jinja: Environment, env: BuildEnvironment) -> None:
     """Generate toolchain-related ninja files."""
 
-    for name, data in config.data["toolchains"].items():
-        toolchains_root = ninja_root.joinpath("toolchains", name)
+    for name, data in env.config.data["toolchains"].items():
+        toolchains_root = env.ninja_root.joinpath("toolchains", name)
         toolchains_root.mkdir(parents=True, exist_ok=True)
 
         render_template(

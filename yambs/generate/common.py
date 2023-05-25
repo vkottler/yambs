@@ -29,13 +29,3 @@ def render_template(
     with root.joinpath(out).open("w", encoding=DEFAULT_ENCODING) as path_fd:
         path_fd.write(jinja.get_template(f"{name}.j2").render(data))
         path_fd.write(linesep)
-
-
-def is_source(path: Path) -> bool:
-    """Determine if a file is a source file."""
-
-    return (
-        path.name.endswith(".c")
-        or path.name.endswith(".cc")
-        or path.name.endswith(".S")
-    )
