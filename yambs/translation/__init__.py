@@ -8,6 +8,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import NamedTuple, Optional
 
+HEADER_EXTENSIONS = {".h", ".hpp"}
+
 
 class SourceTranslator(NamedTuple):
     """
@@ -34,7 +36,7 @@ class SourceTranslator(NamedTuple):
     @property
     def generated_header(self) -> bool:
         """Determine if this translation produces a header file."""
-        return self.output_extension == ".h"
+        return self.output_extension in HEADER_EXTENSIONS
 
 
 DEFAULT = SourceTranslator()
@@ -53,6 +55,11 @@ SOURCES = {
 def is_source(path: Path) -> Optional[SourceTranslator]:
     """Determine if a file is a source file."""
     return SOURCES.get(path.suffix)
+
+
+def is_header(path: Path) -> bool:
+    """determine if a path points to a header file."""
+    return path.suffix in HEADER_EXTENSIONS
 
 
 def get_translator(path: Path) -> SourceTranslator:

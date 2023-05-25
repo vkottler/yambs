@@ -18,7 +18,30 @@ from yambs.generate.architectures import generate as generate_architectures
 from yambs.generate.boards import generate as generate_boards
 from yambs.generate.chips import generate as generate_chips
 from yambs.generate.common import render_template
+from yambs.generate.ninja.format import write_format_target
 from yambs.generate.toolchains import generate as generate_toolchains
+
+
+def create_board_apps(env: BuildEnvironment) -> None:
+    """
+    Generate JSON metadata to give other tools a simple lookup to application
+    sources (e.g. for loading or deploying).
+    """
+
+    board_apps: Dict[str, Any] = {}
+
+    # Ensure that the build root directory is present in the full output paths
+    # for built applications.
+    for board in env.config.board_data:
+        board_apps[board.name] = {
+            short: str(env.config.build_root.joinpath(path))
+            for short, path in board.apps.items()
+        }
+
+    ARBITER.encode(
+        env.ninja_root.joinpath("board_apps.json"),
+        board_apps,
+    )
 
 
 def generate(env: BuildEnvironment) -> None:
@@ -44,17 +67,8 @@ def generate(env: BuildEnvironment) -> None:
     ]:
         gen(jinja, env)
 
-    board_apps: Dict[str, Any] = {}
+    create_board_apps(env)
 
-    # Ensure that the build root directory is present in the full output paths
-    # for built applications.
-    for board in env.config.board_data:
-        board_apps[board.name] = {
-            short: str(env.config.build_root.joinpath(path))
-            for short, path in board.apps.items()
-        }
-
-    ARBITER.encode(
-        env.ninja_root.joinpath("board_apps.json"),
-        board_apps,
-    )
+    # Create format configuration.
+    with env.ninja_root.joinpath("format.ninja").open("w") as path_fd:
+        write_format_target(path_fd, env)
