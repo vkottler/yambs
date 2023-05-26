@@ -17,7 +17,7 @@ from yambs.config.board import Board
 from yambs.environment import BuildEnvironment, SourceSets
 from yambs.generate.common import render_template
 from yambs.generate.ninja import write_link_lines, write_source_line
-from yambs.translation import is_source
+from yambs.translation import is_header, is_source
 
 LOG = getLogger(__name__)
 
@@ -31,10 +31,12 @@ def add_dir(
     current_sources: Set[Path],
     board: Board,
     board_specific: bool = False,
-) -> None:
+) -> Set[Path]:
     """Add a directory to set of paths."""
 
     LOG.debug("%s: checking '%s' for sources.", comment, path)
+
+    headers = set()
 
     if path.is_dir():
         stream.write(linesep + f"# {comment}." + linesep)
@@ -52,6 +54,10 @@ def add_dir(
                         board_specific=board_specific,
                     )
                 )
+            elif is_header(item):
+                headers.add(item)
+
+    return headers
 
 
 def create_paths_dict(root: Path, board: Board) -> Dict[str, Any]:
@@ -79,24 +85,30 @@ def write_sources(
     # Add regular sources.
     all_srcs: Set[Path] = set()
 
+    # Collect header files while we're doing source discovery, too.
+    headers: Set[Path] = set()
+
     for kind, path in create_paths_dict(src_root, board).items():
-        add_dir(
-            stream,
-            all_srcs,
-            path,
-            f"{kind} sources",
-            src_root,
-            env.global_sources,
-            board,
+        headers.update(
+            add_dir(
+                stream,
+                all_srcs,
+                path,
+                f"{kind} sources",
+                src_root,
+                env.global_sources,
+                board,
+            )
         )
 
     # Add any extra sources this board specified.
     for extra in board.extra_dirs:
+        # Don't keep track of external headers.
         add_dir(
             stream,
             all_srcs,
             src_root.joinpath("third-party", extra),
-            "extra sources",
+            f"Extra sources ({extra})",
             src_root,
             env.global_sources,
             board,
@@ -107,18 +119,23 @@ def write_sources(
     for kind, path in create_paths_dict(
         src_root.joinpath("apps"), board
     ).items():
-        add_dir(
-            stream,
-            app_srcs,
-            path,
-            f"{kind} application sources",
-            src_root,
-            env.global_sources,
-            board,
-            # Avoid having a redundant directory in the path when the source
-            # directory is already the board-specific one.
-            board_specific="boards" not in str(path),
+        headers.update(
+            add_dir(
+                stream,
+                app_srcs,
+                path,
+                f"{kind} application sources",
+                src_root,
+                env.global_sources,
+                board,
+                # Avoid having a redundant directory in the path when the
+                # source directory is already the board-specific one.
+                board_specific="boards" not in str(path),
+            )
         )
+
+    # Keep track of all header files.
+    env.first_party_headers.update(headers)
 
     # Populate board sources.
     return env.set_board_sources(board, all_srcs, app_srcs)
