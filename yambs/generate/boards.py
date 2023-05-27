@@ -102,7 +102,9 @@ def write_sources(
         )
 
     # Add any extra sources this board specified.
-    for extra in board.extra_dirs:
+    for extra in board.extra_dirs + env.config.data.get(
+        "extra_third_party", []
+    ):
         # Don't keep track of external headers.
         add_dir(
             stream,
