@@ -39,8 +39,23 @@ def add_dir(
     headers = set()
 
     if path.is_dir():
-        stream.write(linesep + f"# {comment}." + linesep)
+        if comment:
+            stream.write(linesep + f"# {comment}." + linesep)
+
         for item in path.iterdir():
+            # Recurse into other directories.
+            if item.is_dir():
+                add_dir(
+                    stream,
+                    paths,
+                    item,
+                    "",
+                    base,
+                    current_sources,
+                    board,
+                    board_specific=board_specific,
+                )
+
             translator = is_source(item)
             if translator is not None:
                 paths.add(

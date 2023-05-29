@@ -23,7 +23,7 @@ properties:
 
   targets:
     type: array
-    default: [apps, hexs, uf2s]
+    default: [apps]
 
   extra_dirs:
     type: array
