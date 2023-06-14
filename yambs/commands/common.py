@@ -7,7 +7,7 @@ from argparse import ArgumentParser as _ArgumentParser
 from pathlib import Path as _Path
 
 # internal
-from yambs.config import DEFAULT_CONFIG
+from yambs.config.common import DEFAULT_CONFIG
 
 
 def add_common_args(parser: _ArgumentParser) -> None:

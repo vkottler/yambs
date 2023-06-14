@@ -12,10 +12,6 @@ properties:
     type: string
     default: build
 
-  default_target:
-    type: string
-    default: all
-
   cc:
     type: string
     default: gcc
@@ -27,12 +23,6 @@ properties:
   ld:
     type: string
     default: g++
-
-  common_cflags:
-    type: array
-    default: [-Wall, -g, -ffunction-sections]
-    items:
-      type: string
 
   common_ldflags:
     type: array

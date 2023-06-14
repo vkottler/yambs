@@ -16,7 +16,7 @@ from vcorelib.args import CommandFunction as _CommandFunction
 # internal
 from yambs import PKG_NAME
 from yambs.commands.common import add_common_args
-from yambs.config import load
+from yambs.config import Config
 from yambs.environment import BuildEnvironment
 from yambs.generate import generate
 
@@ -24,7 +24,7 @@ from yambs.generate import generate
 def gen_cmd(args: _Namespace) -> int:
     """Execute the gen command."""
 
-    env = BuildEnvironment(load(path=args.config, root=args.dir))
+    env = BuildEnvironment(Config.load(path=args.config, root=args.dir))
     generate(env)
 
     return (

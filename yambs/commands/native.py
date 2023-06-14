@@ -6,11 +6,14 @@ An entry-point for the 'native' command.
 from argparse import ArgumentParser as _ArgumentParser
 from argparse import Namespace as _Namespace
 
+from vcorelib import DEFAULT_ENCODING
+
 # third-party
 from vcorelib.args import CommandFunction as _CommandFunction
 
 # internal
 from yambs.commands.common import add_common_args
+from yambs.config.native import Native
 
 DEFAULT_TARGET = "debug"
 
@@ -18,20 +21,28 @@ DEFAULT_TARGET = "debug"
 def native_cmd(args: _Namespace) -> int:
     """Execute the native command."""
 
-    # Build the 'debug' variant by default.
-    if not args.variants:
-        args.variants.append(DEFAULT_TARGET)
+    config = Native.load(
+        path=args.config, root=args.dir, package_config="native.yaml"
+    )
 
     # src/apps              - all sources are applications to link
+    # collect src/apps sources
+
     # src/* (except 'apps') - sources to link executables with
+    # collect all other sources
 
-    # configurable build variants, defaults are 'debug' and 'optimized'
+    with config.root.joinpath("build.ninja").open(
+        "w", encoding=DEFAULT_ENCODING
+    ) as path_fd:
+        print(path_fd)
 
-    # built outputs go under build/<variant>
+    # generate recipes? or use jinja template
 
-    # generate a single build.ninja with everything in it? (at least to start)
-
-    print(args)
+    for variant, data in config.data["variants"].items():
+        # generate rules for all variants
+        build = config.build_root.joinpath(variant)
+        build.mkdir(exist_ok=True, parents=True)
+        print(data)
 
     return 0
 
@@ -40,13 +51,4 @@ def add_native_cmd(parser: _ArgumentParser) -> _CommandFunction:
     """Add native-command arguments to its parser."""
 
     add_common_args(parser)
-    parser.add_argument(
-        "variants",
-        nargs="*",
-        help=(
-            "variants to build (defaults to "
-            f"'{DEFAULT_TARGET}' if not specified)"
-        ),
-    )
-
     return native_cmd

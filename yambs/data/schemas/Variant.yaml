@@ -1,0 +1,6 @@
+---
+includes:
+  - toolchain_common.yaml
+
+type: object
+additionalProperties: false

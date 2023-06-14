@@ -1,0 +1,12 @@
+---
+variants:
+  debug:
+    extra_cflags:
+      - -g
+      # Instrument builds for coverage and other analysis.
+      - -fprofile-arcs
+      - -ftest-coverage
+
+  optimized:
+    extra_cflags:
+      - -O2

@@ -7,6 +7,16 @@ additionalProperties: false
 required: [boards, chips, toolchains, architectures]
 
 properties:
+  default_target:
+    type: string
+    default: all
+
+  common_cflags:
+    type: array
+    default: [-Wall, -g, -ffunction-sections]
+    items:
+      type: string
+
   boards:
     type: array
     items:

@@ -1,0 +1,24 @@
+---
+includes:
+  - config_common.yaml
+
+type: object
+additionalProperties: false
+
+properties:
+  default_target:
+    type: string
+    default: debug
+
+  common_cflags:
+    type: array
+    default: [-Wall, -Werror, -Wextra, -Wpedantic, -ffunction-sections]
+    items:
+      type: string
+
+  variants:
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^[a-zA-Z0-9-_.]+$":
+        $ref: package://yambs/schemas/Variant.yaml
