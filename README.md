@@ -2,11 +2,11 @@
     =====================================
     generator=datazen
     version=3.1.2
-    hash=bb422a51478a96037d8ddd3a3e4597a7
+    hash=c88caeb9c6d71c51d9fd724250cd248c
     =====================================
 -->
 
-# yambs ([1.7.3](https://pypi.org/project/yambs/))
+# yambs ([1.8.0](https://pypi.org/project/yambs/))
 
 [![python](https://img.shields.io/pypi/pyversions/yambs.svg)](https://pypi.org/project/yambs/)
 ![Build Status](https://github.com/vkottler/yambs/workflows/Python%20Package/badge.svg)
@@ -130,21 +130,23 @@ following a specific convention), put your configuration data here.
 ```
 $ ./venv3.11/bin/mbs -h
 
-usage: mbs [-h] [--version] [-v] [-C DIR] {gen,uf2conv,noop} ...
+usage: mbs [-h] [--version] [-v] [-C DIR] {gen,native,uf2conv,noop} ...
 
 Yet another meta build-system.
 
 options:
-  -h, --help          show this help message and exit
-  --version           show program's version number and exit
-  -v, --verbose       set to increase logging verbosity
-  -C DIR, --dir DIR   execute from a specific directory
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  -v, --verbose         set to increase logging verbosity
+  -C DIR, --dir DIR     execute from a specific directory
 
 commands:
-  {gen,uf2conv,noop}  set of available commands
-    gen               poll the source tree and generate any new build files
-    uf2conv           Convert to UF2 or flash directly.
-    noop              command stub (does nothing)
+  {gen,native,uf2conv,noop}
+                        set of available commands
+    gen                 poll the source tree and generate any new build files
+    native              generate build files for native-only target projects
+    uf2conv             Convert to UF2 or flash directly.
+    noop                command stub (does nothing)
 
 ```
 
@@ -156,6 +158,28 @@ commands:
 $ ./venv3.11/bin/mbs gen -h
 
 usage: mbs gen [-h] [-c CONFIG] [-i] [-w]
+
+options:
+  -h, --help            show this help message and exit
+  -c CONFIG, --config CONFIG
+                        the path to the top-level configuration file (default:
+                        'yambs.yaml')
+  -i, --single-pass     only run a single watch iteration
+  -w, --watch           whether or not to continue watching for source tree
+                        changes
+
+```
+
+### `native`
+
+```
+$ ./venv3.11/bin/mbs native -h
+
+usage: mbs native [-h] [-c CONFIG] [-i] [-w] [variants ...]
+
+positional arguments:
+  variants              variants to build (defaults to 'debug' if not
+                        specified)
 
 options:
   -h, --help            show this help message and exit

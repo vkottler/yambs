@@ -15,7 +15,8 @@ from vcorelib.args import CommandFunction as _CommandFunction
 
 # internal
 from yambs import PKG_NAME
-from yambs.config import DEFAULT_CONFIG, load
+from yambs.commands.common import add_common_args
+from yambs.config import load
 from yambs.environment import BuildEnvironment
 from yambs.generate import generate
 
@@ -53,27 +54,5 @@ def gen_cmd(args: _Namespace) -> int:
 def add_gen_cmd(parser: _ArgumentParser) -> _CommandFunction:
     """Add gen-command arguments to its parser."""
 
-    parser.add_argument(
-        "-c",
-        "--config",
-        type=_Path,
-        default=DEFAULT_CONFIG,
-        help=(
-            "the path to the top-level configuration "
-            "file (default: '%(default)s')"
-        ),
-    )
-    parser.add_argument(
-        "-i",
-        "--single-pass",
-        action="store_true",
-        help="only run a single watch iteration",
-    )
-    parser.add_argument(
-        "-w",
-        "--watch",
-        action="store_true",
-        help="whether or not to continue watching for source tree changes",
-    )
-
+    add_common_args(parser)
     return gen_cmd
