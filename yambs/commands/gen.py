@@ -19,9 +19,9 @@ from yambs.generate import generate
 def gen_cmd(args: _Namespace) -> int:
     """Execute the gen command."""
 
-    env = BuildEnvironment(Config.load(path=args.config, root=args.dir))
-    generate(env)
-    return run_watch(args, env.config.src_root, "gen")
+    config = Config.load(path=args.config, root=args.dir)
+    generate(BuildEnvironment(config))
+    return run_watch(args, config.src_root, "gen")
 
 
 def add_gen_cmd(parser: _ArgumentParser) -> _CommandFunction:

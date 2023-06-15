@@ -18,14 +18,13 @@ from yambs.environment.native import NativeBuildEnvironment
 def native_cmd(args: _Namespace) -> int:
     """Execute the native command."""
 
-    env = NativeBuildEnvironment(
-        Native.load(
-            path=args.config, root=args.dir, package_config="native.yaml"
-        )
+    config = Native.load(
+        path=args.config, root=args.dir, package_config="native.yaml"
     )
-    env.generate()
 
-    return run_watch(args, env.config.src_root, "native")
+    NativeBuildEnvironment(config).generate()
+
+    return run_watch(args, config.src_root, "native")
 
 
 def add_native_cmd(parser: _ArgumentParser) -> _CommandFunction:
