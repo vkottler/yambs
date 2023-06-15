@@ -11,6 +11,9 @@ include $include_dir/all.ninja
 {% include "compile_commands.ninja.j2" %}
 
 
-build all: phony all_boards compdb
+build all: phony all_variants compdb
 
-default {{default_target}}
+default_target = {{default_target}}
+build single: phony $default_target compdb
+
+default single

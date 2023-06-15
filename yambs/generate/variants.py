@@ -17,9 +17,11 @@ def generate(jinja: Environment, config: CommonConfig) -> None:
         variants_root = config.ninja_root.joinpath("variants", name)
         variants_root.mkdir(parents=True, exist_ok=True)
 
+        data["name"] = name
         render_template(
             jinja,
             variants_root,
             "variant.ninja",
             data,
         )
+        del data["name"]
