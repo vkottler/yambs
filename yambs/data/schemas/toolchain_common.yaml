@@ -1,0 +1,15 @@
+---
+properties:
+  c_standard:
+    type: string
+    default: gnu17
+
+  cxx_standard:
+    type: string
+    default: gnu++20
+
+  extra_cflags:
+    type: array
+    default: []
+    items:
+      type: string

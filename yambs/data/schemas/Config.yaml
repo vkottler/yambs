@@ -1,9 +1,22 @@
 ---
+includes:
+  - config_common.yaml
+
 type: object
 additionalProperties: false
 required: [boards, chips, toolchains, architectures]
 
 properties:
+  default_target:
+    type: string
+    default: all
+
+  common_cflags:
+    type: array
+    default: [-Wall, -g, -ffunction-sections]
+    items:
+      type: string
+
   boards:
     type: array
     items:
@@ -29,48 +42,3 @@ properties:
     patternProperties:
       "^[a-zA-Z0-9-_.+]+$":
         $ref: package://yambs/schemas/Architecture.yaml
-
-  src_root:
-    type: string
-    default: src
-
-  default_target:
-    type: string
-    default: all
-
-  ninja_out:
-    type: string
-    default: ninja
-
-  build_root:
-    type: string
-    default: build
-
-  cc:
-    type: string
-    default: gcc
-
-  cxx:
-    type: string
-    default: g++
-
-  ld:
-    type: string
-    default: g++
-
-  common_cflags:
-    type: array
-    default: [-Wall, -g, -ffunction-sections]
-    items:
-      type: string
-
-  common_ldflags:
-    type: array
-    default: ["-Wl,--gc-sections"]
-    items:
-      type: string
-
-  extra_third_party:
-    type: array
-    items:
-      type: string

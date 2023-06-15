@@ -1,0 +1,5 @@
+---
+properties:
+  targets:
+    type: array
+    default: [apps]

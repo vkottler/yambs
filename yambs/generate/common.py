@@ -8,10 +8,26 @@ from pathlib import Path
 from typing import Any, Dict
 
 # third-party
-from jinja2 import Environment
-
-# third-party
+from datazen.templates import environment
+from jinja2 import Environment, FileSystemLoader
 from vcorelib import DEFAULT_ENCODING
+from vcorelib.paths import resource
+
+# internal
+from yambs import PKG_NAME
+
+APP_ROOT = "apps"
+
+
+def get_jinja() -> Environment:
+    """Get a jinja environment for package templates."""
+
+    templates_dir = resource("templates", package=PKG_NAME)
+    assert templates_dir is not None
+
+    return environment(
+        loader=FileSystemLoader([templates_dir], followlinks=True)
+    )
 
 
 def render_template(

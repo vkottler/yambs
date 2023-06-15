@@ -6,8 +6,6 @@ A module for generating templated outputs.
 from typing import Any, Dict
 
 # third-party
-from datazen.templates import environment
-from jinja2 import FileSystemLoader
 from vcorelib.io import ARBITER
 from vcorelib.paths import resource
 
@@ -17,8 +15,8 @@ from yambs.environment import BuildEnvironment
 from yambs.generate.architectures import generate as generate_architectures
 from yambs.generate.boards import generate as generate_boards
 from yambs.generate.chips import generate as generate_chips
-from yambs.generate.common import render_template
-from yambs.generate.ninja.format import write_format_target
+from yambs.generate.common import get_jinja, render_template
+from yambs.generate.ninja.format import render_format
 from yambs.generate.toolchains import generate as generate_toolchains
 
 
@@ -39,7 +37,7 @@ def create_board_apps(env: BuildEnvironment) -> None:
         }
 
     ARBITER.encode(
-        env.ninja_root.joinpath("board_apps.json"),
+        env.config.ninja_root.joinpath("board_apps.json"),
         board_apps,
     )
 
@@ -50,9 +48,7 @@ def generate(env: BuildEnvironment) -> None:
     templates_dir = resource("templates", package=PKG_NAME)
     assert templates_dir is not None
 
-    jinja = environment(
-        loader=FileSystemLoader([templates_dir], followlinks=True)
-    )
+    jinja = get_jinja()
 
     # Render the top-level configuration. This is the only file that's
     # generated into the root directory.
@@ -63,12 +59,12 @@ def generate(env: BuildEnvironment) -> None:
         generate_chips,
         generate_toolchains,
         generate_architectures,
-        generate_boards,
     ]:
-        gen(jinja, env)
+        gen(jinja, env.config)
+
+    generate_boards(jinja, env)
 
     create_board_apps(env)
 
     # Create format configuration.
-    with env.ninja_root.joinpath("format.ninja").open("w") as path_fd:
-        write_format_target(path_fd, env)
+    render_format(env.config, env.first_party_sources_headers())

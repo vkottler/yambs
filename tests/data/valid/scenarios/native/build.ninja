@@ -1,0 +1,19 @@
+include_dir = ninja
+src_dir = src
+generated_dir = $src_dir/generated
+
+# Flags common to all builds, regardless of variant.
+common_cflags = -I${src_dir} -Wall -Werror -Wextra -Wpedantic -ffunction-sections
+
+include $include_dir/all.ninja
+
+rule compile_commands
+  command = ninja -t compdb > compile_commands.json
+build compdb: compile_commands
+
+build all: phony all_variants compdb
+
+default_target = debug
+build single: phony $default_target compdb
+
+default single

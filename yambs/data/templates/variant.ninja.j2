@@ -1,0 +1,13 @@
+variant = {{name}}
+c_standard = {{c_standard}}
+cxx_standard = {{cxx_standard}}
+{% if extra_cflags %}
+variant_cflags ={% for flag in extra_cflags %} {{flag}}{% endfor %}
+
+{% endif %}
+
+include $include_dir/rules.ninja
+include $include_dir/sources.ninja
+include $include_dir/apps.ninja
+
+build $variant: phony{% for task in targets %} {{name}}_{{task}}{% endfor %}

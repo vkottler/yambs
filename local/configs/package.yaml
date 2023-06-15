@@ -5,7 +5,7 @@ description: Yet another meta build-system.
 entry: {{entry}}
 requirements:
   - datazen
-  - vcorelib
+  - vcorelib>=1.6.8
   - rcmpy>=1.5.0
 dev_requirements:
   - setuptools-wrapper
@@ -14,5 +14,7 @@ dev_requirements:
 commands:
   - name: gen
     description: poll the source tree and generate any new build files
+  - name: native
+    description: generate build files for native-only target projects
   - name: uf2conv
     description: Convert to UF2 or flash directly.

@@ -1,0 +1,36 @@
+---
+properties:
+  src_root:
+    type: string
+    default: src
+
+  ninja_out:
+    type: string
+    default: ninja
+
+  build_root:
+    type: string
+    default: build
+
+  cc:
+    type: string
+    default: gcc
+
+  cxx:
+    type: string
+    default: g++
+
+  ld:
+    type: string
+    default: g++
+
+  common_ldflags:
+    type: array
+    default: ["-Wl,--gc-sections"]
+    items:
+      type: string
+
+  extra_third_party:
+    type: array
+    items:
+      type: string

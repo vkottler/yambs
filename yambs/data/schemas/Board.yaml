@@ -1,4 +1,7 @@
 ---
+includes:
+  - targets_common.yaml
+
 type: object
 additionalProperties: false
 required: [name, chip]
@@ -20,10 +23,6 @@ properties:
     default: ["-T$include_dir/chips/$chip/chip.ld"]
     items:
       type: string
-
-  targets:
-    type: array
-    default: [apps]
 
   extra_dirs:
     type: array
