@@ -10,7 +10,7 @@ from argparse import Namespace as _Namespace
 from vcorelib.args import CommandFunction as _CommandFunction
 
 # internal
-from yambs.commands.common import add_common_args
+from yambs.commands.common import add_common_args, run_watch
 from yambs.config.native import Native
 from yambs.environment.native import NativeBuildEnvironment
 
@@ -25,7 +25,7 @@ def native_cmd(args: _Namespace) -> int:
     )
     env.generate()
 
-    return 0
+    return run_watch(args, env.config.src_root, "native")
 
 
 def add_native_cmd(parser: _ArgumentParser) -> _CommandFunction:
