@@ -10,6 +10,7 @@ from typing import Any, Dict, Type, TypeVar
 from vcorelib.dict import merge
 from vcorelib.dict.codec import BasicDictCodec as _BasicDictCodec
 from vcorelib.io import ARBITER as _ARBITER
+from vcorelib.io import DEFAULT_INCLUDES_KEY
 from vcorelib.io.types import JsonObject as _JsonObject
 from vcorelib.paths import Pathlike, find_file, normalize
 
@@ -24,7 +25,11 @@ class CommonConfig(_BasicDictCodec):
     """A common, base configuration."""
 
     data: Dict[str, Any]
+
     root: Path
+    src_root: Path
+    build_root: Path
+    ninja_root: Path
 
     def directory(self, name: str, mkdir: bool = True) -> Path:
         """Get a configurable directory."""
@@ -46,6 +51,7 @@ class CommonConfig(_BasicDictCodec):
 
         self.src_root = self.directory("src_root")
         self.build_root = self.directory("build_root")
+        self.ninja_root = self.directory("ninja_out")
 
     @classmethod
     def load(
@@ -61,9 +67,11 @@ class CommonConfig(_BasicDictCodec):
 
         data = merge(
             _ARBITER.decode(
-                src_config, includes_key="includes", require_success=True
+                src_config,
+                includes_key=DEFAULT_INCLUDES_KEY,
+                require_success=True,
             ).data,
-            _ARBITER.decode(path, includes_key="includes").data,
+            _ARBITER.decode(path, includes_key=DEFAULT_INCLUDES_KEY).data,
             # Always allow the project-specific configuration to override
             # package data.
             expect_overwrite=True,

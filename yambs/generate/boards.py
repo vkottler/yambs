@@ -15,7 +15,7 @@ from vcorelib.paths import rel
 # internal
 from yambs.config.board import Board
 from yambs.environment import BuildEnvironment, SourceSets
-from yambs.generate.common import render_template
+from yambs.generate.common import APP_ROOT, render_template
 from yambs.generate.ninja import write_link_lines, write_source_line
 from yambs.translation import is_header, is_source
 
@@ -134,7 +134,7 @@ def write_sources(
     # Add application sources.
     app_srcs: Set[Path] = set()
     for kind, path in create_paths_dict(
-        src_root.joinpath("apps"), board
+        src_root.joinpath(APP_ROOT), board
     ).items():
         headers.update(
             add_dir(
@@ -163,12 +163,14 @@ def generate(jinja: Environment, env: BuildEnvironment) -> None:
 
     # Render the board manifest and rules file.
     for template in ["all.ninja", "rules.ninja"]:
-        render_template(jinja, env.ninja_root, template, env.config.data)
+        render_template(
+            jinja, env.config.ninja_root, template, env.config.data
+        )
 
     src_root = rel(env.config.src_root)
 
     for board, raw_data in env.config.boards():
-        board_root = env.ninja_root.joinpath("boards", board.name)
+        board_root = env.config.ninja_root.joinpath("boards", board.name)
         board_root.mkdir(parents=True, exist_ok=True)
         render_template(jinja, board_root, "board.ninja", raw_data)
 

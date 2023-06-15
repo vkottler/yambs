@@ -8,11 +8,6 @@ properties:
     type: string
     default: gnu++20
 
-  # If set, overrides any other toolchain pathing or prefix construction.
-  prefix:
-    type: string
-    default: ""
-
   extra_cflags:
     type: array
     default: []

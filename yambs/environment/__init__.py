@@ -53,8 +53,6 @@ class BuildEnvironment(LoggerMixin):
 
         self.config = config
 
-        self.ninja_root = self.config.directory("ninja_out")
-
         # Keep track of all overall sources, so that no duplicate rules are
         # generated.
         self.global_sources: Set[Path] = set()
