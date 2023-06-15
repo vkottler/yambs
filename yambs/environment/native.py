@@ -10,9 +10,10 @@ from typing import Set
 from vcorelib.logging import LoggerMixin
 
 # internal
-from yambs.aggregation import collect_files, populate_sources
+from yambs.aggregation import collect_files, populate_sources, sources_headers
 from yambs.config.native import Native
 from yambs.generate.common import get_jinja, render_template
+from yambs.generate.ninja.format import render_format
 from yambs.generate.variants import generate as generate_variants
 
 
@@ -52,7 +53,16 @@ class NativeBuildEnvironment(LoggerMixin):
             self.render(self.config.ninja_root, f"{template}.ninja")
 
         # Render sources file.
+        with self.config.ninja_root.joinpath("sources.ninja").open(
+            "w"
+        ) as path_fd:
+            print(path_fd)
 
         # Render apps file.
+        with self.config.ninja_root.joinpath("apps.ninja").open(
+            "w"
+        ) as path_fd:
+            print(path_fd)
 
         # Render format file.
+        render_format(self.config, sources_headers(self.sources))

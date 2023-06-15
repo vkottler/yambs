@@ -16,7 +16,7 @@ from yambs.generate.architectures import generate as generate_architectures
 from yambs.generate.boards import generate as generate_boards
 from yambs.generate.chips import generate as generate_chips
 from yambs.generate.common import get_jinja, render_template
-from yambs.generate.ninja.format import write_format_target
+from yambs.generate.ninja.format import render_format
 from yambs.generate.toolchains import generate as generate_toolchains
 
 
@@ -67,5 +67,4 @@ def generate(env: BuildEnvironment) -> None:
     create_board_apps(env)
 
     # Create format configuration.
-    with env.config.ninja_root.joinpath("format.ninja").open("w") as path_fd:
-        write_format_target(path_fd, env)
+    render_format(env.config, env.first_party_sources_headers())

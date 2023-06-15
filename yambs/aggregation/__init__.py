@@ -33,6 +33,16 @@ def compile_sources(paths: BySuffixPaths) -> Set[Path]:
     return paths[".c"] | paths[".cc"] | paths[".S"] | paths[".cpp"]
 
 
+def headers(paths: BySuffixPaths) -> Set[Path]:
+    """Get header files."""
+    return paths[".h"] | paths[".hpp"] | paths[".hh"]
+
+
+def sources_headers(paths: BySuffixPaths) -> Set[Path]:
+    """Get sources and header files."""
+    return compile_sources(paths) | headers(paths)
+
+
 def populate_sources(
     paths: BySuffixPaths, src_root: Path, apps: Set[Path], regular: Set[Path]
 ) -> None:
