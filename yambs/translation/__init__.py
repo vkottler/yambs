@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import NamedTuple, Optional
 
 HEADER_EXTENSIONS = {".h", ".hpp"}
+BUILD_DIR_VAR = "$build_dir"
 
 
 class SourceTranslator(NamedTuple):
@@ -19,7 +20,7 @@ class SourceTranslator(NamedTuple):
 
     rule: str = "cc"
     output_extension: str = ".o"
-    dest: Path = Path("$build_dir")
+    dest: Path = Path(BUILD_DIR_VAR)
 
     def output(self, path: Path) -> Path:
         """Get the output file from a given path."""

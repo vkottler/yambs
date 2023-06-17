@@ -10,7 +10,7 @@ from typing import Set, TextIO
 # internal
 from yambs.config.board import Board
 from yambs.environment import SourceSets
-from yambs.translation import SourceTranslator
+from yambs.translation import BUILD_DIR_VAR, SourceTranslator
 
 
 def write_source_line(
@@ -70,10 +70,10 @@ def write_link_line(
         for x in ["o", "elf", "bin", "hex", "dump", "uf2"]
     }
 
-    elf = f"$build_dir/{by_suffix['elf']}"
+    elf = f"{BUILD_DIR_VAR}/{by_suffix['elf']}"
     line = f"build {elf}: link "
     offset = " " * len(line)
-    stream.write(line + f"$build_dir/{by_suffix['o']}")
+    stream.write(line + f"{BUILD_DIR_VAR}/{by_suffix['o']}")
 
     for src, trans in sources.link_sources():
         write_continuation(stream, offset)
@@ -81,17 +81,21 @@ def write_link_line(
     stream.write(linesep)
 
     # Add lines for creating binaries.
-    stream.write(f"build $build_dir/{by_suffix['bin']}: bin {elf}" + linesep)
+    stream.write(
+        f"build {BUILD_DIR_VAR}/{by_suffix['bin']}: bin {elf}" + linesep
+    )
 
     # Add an objdump target.
-    stream.write(f"build $build_dir/{by_suffix['dump']}: dump {elf}" + linesep)
+    stream.write(
+        f"build {BUILD_DIR_VAR}/{by_suffix['dump']}: dump {elf}" + linesep
+    )
 
     # Add an hex target.
-    hex_path = f"$build_dir/{by_suffix['hex']}"
+    hex_path = f"{BUILD_DIR_VAR}/{by_suffix['hex']}"
     stream.write(f"build {hex_path}: hex {elf}" + linesep)
 
     # Add a uf2 target.
-    stream.write(f"build $build_dir/{by_suffix['uf2']}: uf2 {hex_path}")
+    stream.write(f"build {BUILD_DIR_VAR}/{by_suffix['uf2']}: uf2 {hex_path}")
 
     stream.write(linesep + linesep)
 
@@ -158,10 +162,10 @@ def write_phony(
 
             line = f"build {board}_{phony}: phony "
             offset = " " * len(line)
-            stream.write(line + f"$build_dir/{first.with_suffix(suffix)}")
+            stream.write(line + f"{BUILD_DIR_VAR}/{first.with_suffix(suffix)}")
             for src in srcs:
                 write_continuation(stream, offset)
                 src = src.relative_to(base)
-                stream.write(f"$build_dir/{src.with_suffix(suffix)}")
+                stream.write(f"{BUILD_DIR_VAR}/{src.with_suffix(suffix)}")
 
             stream.write(linesep)
