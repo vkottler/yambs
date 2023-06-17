@@ -42,7 +42,7 @@ def create_board_apps(env: BuildEnvironment) -> None:
     )
 
 
-def generate(env: BuildEnvironment) -> None:
+def generate(env: BuildEnvironment, sources_only: bool = False) -> None:
     """Generate ninja files."""
 
     templates_dir = resource("templates", package=PKG_NAME)
@@ -50,19 +50,26 @@ def generate(env: BuildEnvironment) -> None:
 
     jinja = get_jinja()
 
-    # Render the top-level configuration. This is the only file that's
-    # generated into the root directory.
-    render_template(jinja, env.config.root, "build.ninja", env.config.data)
+    if not sources_only:
+        # Render the top-level configuration. This is the only file that's
+        # generated into the root directory.
+        render_template(jinja, env.config.root, "build.ninja", env.config.data)
 
-    # Generate all other files.
-    for gen in [
-        generate_chips,
-        generate_toolchains,
-        generate_architectures,
-    ]:
-        gen(jinja, env.config)
+        # Generate all other files.
+        for gen in [
+            generate_chips,
+            generate_toolchains,
+            generate_architectures,
+        ]:
+            gen(jinja, env.config)
 
-    generate_boards(jinja, env)
+        # Render the board manifest and rules file.
+        for template in ["all.ninja", "rules.ninja"]:
+            render_template(
+                jinja, env.config.ninja_root, template, env.config.data
+            )
+
+    generate_boards(jinja, env, sources_only=sources_only)
 
     create_board_apps(env)
 

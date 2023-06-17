@@ -20,7 +20,7 @@ def gen_cmd(args: _Namespace) -> int:
     """Execute the gen command."""
 
     config = Config.load(path=args.config, root=args.dir)
-    generate(BuildEnvironment(config))
+    generate(BuildEnvironment(config), sources_only=args.sources)
     return run_watch(args, config.src_root, "gen")
 
 

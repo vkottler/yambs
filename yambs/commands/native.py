@@ -22,7 +22,7 @@ def native_cmd(args: _Namespace) -> int:
         path=args.config, root=args.dir, package_config="native.yaml"
     )
 
-    NativeBuildEnvironment(config).generate()
+    NativeBuildEnvironment(config).generate(sources_only=args.sources)
 
     return run_watch(args, config.src_root, "native")
 
