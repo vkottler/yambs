@@ -5,9 +5,10 @@ A module implementing a native-build environment.
 # built-in
 from os import linesep
 from pathlib import Path
-from typing import List, Set, TextIO
+from typing import Any, Dict, Set, TextIO
 
 # third-party
+from vcorelib.io import ARBITER
 from vcorelib.logging import LoggerMixin
 
 # internal
@@ -17,7 +18,12 @@ from yambs.generate.common import get_jinja, render_template
 from yambs.generate.ninja import write_continuation
 from yambs.generate.ninja.format import render_format
 from yambs.generate.variants import generate as generate_variants
-from yambs.translation import get_translator
+from yambs.translation import BUILD_DIR_VAR, get_translator
+
+
+def resolve_build_dir(build_root: Path, variant: str, path: Path) -> Path:
+    """Resolve the build-directory variable in a path."""
+    return build_root.joinpath(variant, path.relative_to(BUILD_DIR_VAR))
 
 
 class NativeBuildEnvironment(LoggerMixin):
@@ -67,17 +73,17 @@ class NativeBuildEnvironment(LoggerMixin):
 
     def write_app_rules(
         self, stream: TextIO, outputs: Set[Path]
-    ) -> List[Path]:
+    ) -> Dict[Path, Path]:
         """Write app rules."""
 
-        elfs: List[Path] = []
+        elfs: Dict[Path, Path] = {}
 
         for path in self.apps:
             out = self.write_compile_line(stream, path)
 
             from_src = path.relative_to(self.config.src_root)
-            elf = Path("$build_dir", from_src.with_suffix(".elf"))
-            elfs.append(elf)
+            elf = Path(BUILD_DIR_VAR, from_src.with_suffix(".elf"))
+            elfs[path] = elf
             line = f"build {elf}: link "
             offset = " " * len(line)
 
@@ -92,13 +98,37 @@ class NativeBuildEnvironment(LoggerMixin):
         line = "build ${variant}_apps: phony "
         offset = " " * len(line)
 
-        stream.write(line + str(elfs[0]))
-        for elf in elfs[1:]:
+        elfs_list = list(elfs.values())
+        stream.write(line + str(elfs_list[0]))
+        for elf in elfs_list[1:]:
             write_continuation(stream, offset)
             stream.write(str(elf))
         stream.write(linesep)
 
         return elfs
+
+    def _render_app_manifest(self, elfs: Dict[Path, Path]) -> None:
+        """Render the application manifest."""
+
+        data: Dict[str, Any] = {}
+        for app in self.apps:
+            name = app.with_suffix("").name
+            assert name not in data, f"Duplicate app name '{name}' ({app})!"
+            data[name] = {
+                "source": str(app),
+                "variants": {
+                    variant: str(
+                        resolve_build_dir(
+                            self.config.build_root, variant, elfs[app]
+                        )
+                    )
+                    for variant in self.config.data["variants"]
+                },
+            }
+
+        path = self.config.ninja_root.joinpath("apps.json")
+        ARBITER.encode(path, {"all": data})
+        self.logger.info("Wrote '%s'.", path)
 
     def generate(self, sources_only: bool = False) -> None:
         """Generate ninja files."""
@@ -119,8 +149,11 @@ class NativeBuildEnvironment(LoggerMixin):
         # Render apps file.
         path = self.config.ninja_root.joinpath("apps.ninja")
         with path.open("w") as path_fd:
-            self.write_app_rules(path_fd, outputs)
+            elfs = self.write_app_rules(path_fd, outputs)
             self.logger.info("Wrote '%s'.", path)
 
         # Render format file.
         render_format(self.config, sources_headers(self.sources))
+
+        # Render application manifest.
+        self._render_app_manifest(elfs)
