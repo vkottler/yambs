@@ -158,24 +158,26 @@ def write_sources(
     return env.set_board_sources(board, all_srcs, app_srcs)
 
 
-def generate(jinja: Environment, env: BuildEnvironment) -> None:
+def generate(
+    jinja: Environment, env: BuildEnvironment, sources_only: bool = False
+) -> None:
     """Generate board-related ninja files."""
-
-    # Render the board manifest and rules file.
-    for template in ["all.ninja", "rules.ninja"]:
-        render_template(
-            jinja, env.config.ninja_root, template, env.config.data
-        )
-
-    src_root = rel(env.config.src_root)
 
     for board, raw_data in env.config.boards():
         board_root = env.config.ninja_root.joinpath("boards", board.name)
         board_root.mkdir(parents=True, exist_ok=True)
-        render_template(jinja, board_root, "board.ninja", raw_data)
+
+        if not sources_only:
+            render_template(jinja, board_root, "board.ninja", raw_data)
+
+        src_root = rel(env.config.src_root)
 
         # Perform source-file discovery.
-        with board_root.joinpath("sources.ninja").open("w") as path_fd:
-            sources = write_sources(path_fd, board, src_root, env)
-
-        write_link_lines(board_root, src_root, board, sources)
+        with board_root.joinpath("sources.ninja").open("w") as sources_fd:
+            with board_root.joinpath("apps.ninja").open("w") as apps_fd:
+                write_link_lines(
+                    apps_fd,
+                    src_root,
+                    board,
+                    write_sources(sources_fd, board, src_root, env),
+                )

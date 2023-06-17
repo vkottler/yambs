@@ -110,9 +110,6 @@ class NativeBuildEnvironment(LoggerMixin):
             for template in ["all", "rules"]:
                 self.render(self.config.ninja_root, f"{template}.ninja")
 
-            # Render format file.
-            render_format(self.config, sources_headers(self.sources))
-
         # Render sources file.
         path = self.config.ninja_root.joinpath("sources.ninja")
         with path.open("w") as path_fd:
@@ -124,3 +121,6 @@ class NativeBuildEnvironment(LoggerMixin):
         with path.open("w") as path_fd:
             self.write_app_rules(path_fd, outputs)
             self.logger.info("Wrote '%s'.", path)
+
+        # Render format file.
+        render_format(self.config, sources_headers(self.sources))

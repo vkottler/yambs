@@ -123,20 +123,19 @@ def write_generated_phony(
 
 
 def write_link_lines(
-    board_root: Path, src_root: Path, board: Board, sources: SourceSets
+    stream: TextIO, src_root: Path, board: Board, sources: SourceSets
 ) -> None:
     """Write the application manifest and phony targets."""
 
     # Write the application manifest.
-    with board_root.joinpath("apps.ninja").open("w") as path_fd:
-        for app_src in sources.apps:
-            write_link_line(path_fd, app_src, src_root, board, sources)
+    for app_src in sources.apps:
+        write_link_line(stream, app_src, src_root, board, sources)
 
-        write_generated_phony(path_fd, sources, src_root)
+    write_generated_phony(stream, sources, src_root)
 
-        # Write the phony target.
-        path_fd.write("# A target to build all applications." + linesep)
-        write_phony(path_fd, sources.apps, src_root, board.name)
+    # Write the phony target.
+    stream.write("# A target to build all applications." + linesep)
+    write_phony(stream, sources.apps, src_root, board.name)
 
 
 def write_phony(

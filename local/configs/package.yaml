@@ -3,6 +3,8 @@ name: yambs
 version: "{{major}}.{{minor}}.{{patch}}"
 description: Yet another meta build-system.
 entry: {{entry}}
+time_command: true
+
 requirements:
   - datazen
   - vcorelib>=1.6.8
