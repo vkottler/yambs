@@ -2,11 +2,11 @@
     =====================================
     generator=datazen
     version=3.1.2
-    hash=c88caeb9c6d71c51d9fd724250cd248c
+    hash=47efb6aab42b656852a2fdb9a25350fe
     =====================================
 -->
 
-# yambs ([1.8.0](https://pypi.org/project/yambs/))
+# yambs ([1.8.1](https://pypi.org/project/yambs/))
 
 [![python](https://img.shields.io/pypi/pyversions/yambs.svg)](https://pypi.org/project/yambs/)
 ![Build Status](https://github.com/vkottler/yambs/workflows/Python%20Package/badge.svg)
@@ -157,7 +157,7 @@ commands:
 ```
 $ ./venv3.11/bin/mbs gen -h
 
-usage: mbs gen [-h] [-c CONFIG] [-i] [-w]
+usage: mbs gen [-h] [-c CONFIG] [-i] [-w] [-s]
 
 options:
   -h, --help            show this help message and exit
@@ -167,6 +167,7 @@ options:
   -i, --single-pass     only run a single watch iteration
   -w, --watch           whether or not to continue watching for source tree
                         changes
+  -s, --sources         whether or not to only re-generate source manifests
 
 ```
 
@@ -175,11 +176,7 @@ options:
 ```
 $ ./venv3.11/bin/mbs native -h
 
-usage: mbs native [-h] [-c CONFIG] [-i] [-w] [variants ...]
-
-positional arguments:
-  variants              variants to build (defaults to 'debug' if not
-                        specified)
+usage: mbs native [-h] [-c CONFIG] [-i] [-w] [-s]
 
 options:
   -h, --help            show this help message and exit
@@ -189,6 +186,7 @@ options:
   -i, --single-pass     only run a single watch iteration
   -w, --watch           whether or not to continue watching for source tree
                         changes
+  -s, --sources         whether or not to only re-generate source manifests
 
 ```
 

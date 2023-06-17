@@ -42,9 +42,11 @@ class NativeBuildEnvironment(LoggerMixin):
 
     def render(self, root: Path, name: str) -> None:
         """Render a template."""
+
         render_template(
             self.jinja, root, f"native_{name}", self.config.data, out=name
         )
+        self.logger.info("Rendered '%s'.", root.joinpath(name))
 
     def write_compile_line(self, stream: TextIO, path: Path) -> Path:
         """Write a single source-compile line."""
@@ -98,26 +100,27 @@ class NativeBuildEnvironment(LoggerMixin):
 
         return elfs
 
-    def generate(self) -> None:
+    def generate(self, sources_only: bool = False) -> None:
         """Generate ninja files."""
 
-        # Render templates.
-        generate_variants(self.jinja, self.config)
-        self.render(self.config.root, "build.ninja")
-        for template in ["all", "rules"]:
-            self.render(self.config.ninja_root, f"{template}.ninja")
+        if not sources_only:
+            # Render templates.
+            generate_variants(self.jinja, self.config)
+            self.render(self.config.root, "build.ninja")
+            for template in ["all", "rules"]:
+                self.render(self.config.ninja_root, f"{template}.ninja")
+
+            # Render format file.
+            render_format(self.config, sources_headers(self.sources))
 
         # Render sources file.
-        with self.config.ninja_root.joinpath("sources.ninja").open(
-            "w"
-        ) as path_fd:
+        path = self.config.ninja_root.joinpath("sources.ninja")
+        with path.open("w") as path_fd:
             outputs = self.write_source_rules(path_fd)
+            self.logger.info("Wrote '%s'.", path)
 
         # Render apps file.
-        with self.config.ninja_root.joinpath("apps.ninja").open(
-            "w"
-        ) as path_fd:
+        path = self.config.ninja_root.joinpath("apps.ninja")
+        with path.open("w") as path_fd:
             self.write_app_rules(path_fd, outputs)
-
-        # Render format file.
-        render_format(self.config, sources_headers(self.sources))
+            self.logger.info("Wrote '%s'.", path)

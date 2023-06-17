@@ -42,6 +42,12 @@ def add_common_args(parser: _ArgumentParser) -> None:
         action="store_true",
         help="whether or not to continue watching for source tree changes",
     )
+    parser.add_argument(
+        "-s",
+        "--sources",
+        action="store_true",
+        help="whether or not to only re-generate source manifests",
+    )
 
 
 def run_watch(args: _Namespace, src_root: _Path, command: str) -> int:
@@ -59,6 +65,7 @@ def run_watch(args: _Namespace, src_root: _Path, command: str) -> int:
                     "-C",
                     str(args.dir),
                     command,
+                    "-s",
                     "-c",
                     str(args.config),
                 ],
