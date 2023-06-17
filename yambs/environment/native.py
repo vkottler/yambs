@@ -49,10 +49,10 @@ class NativeBuildEnvironment(LoggerMixin):
     def render(self, root: Path, name: str) -> None:
         """Render a template."""
 
-        render_template(
-            self.jinja, root, f"native_{name}", self.config.data, out=name
-        )
-        self.logger.info("Rendered '%s'.", root.joinpath(name))
+        with self.log_time("Render '%s'", root.joinpath(name)):
+            render_template(
+                self.jinja, root, f"native_{name}", self.config.data, out=name
+            )
 
     def write_compile_line(self, stream: TextIO, path: Path) -> Path:
         """Write a single source-compile line."""
@@ -110,25 +110,35 @@ class NativeBuildEnvironment(LoggerMixin):
     def _render_app_manifest(self, elfs: Dict[Path, Path]) -> None:
         """Render the application manifest."""
 
-        data: Dict[str, Any] = {}
-        for app in self.apps:
-            name = app.with_suffix("").name
-            assert name not in data, f"Duplicate app name '{name}' ({app})!"
-            data[name] = {
-                "source": str(app),
-                "variants": {
-                    variant: str(
-                        resolve_build_dir(
-                            self.config.build_root, variant, elfs[app]
-                        )
-                    )
-                    for variant in self.config.data["variants"]
-                },
-            }
-
         path = self.config.ninja_root.joinpath("apps.json")
-        ARBITER.encode(path, {"all": data})
-        self.logger.info("Wrote '%s'.", path)
+        with self.log_time("Write '%s'", path):
+            data: Dict[str, Any] = {}
+
+            for app in self.apps:
+                name = app.with_suffix("").name
+                assert (
+                    name not in data
+                ), f"Duplicate app name '{name}' ({app})!"
+
+                data[name] = {
+                    "source": str(app),
+                    "variants": {
+                        variant: str(
+                            resolve_build_dir(
+                                self.config.build_root, variant, elfs[app]
+                            )
+                        )
+                        for variant in self.config.data["variants"]
+                    },
+                }
+
+            ARBITER.encode(
+                path,
+                {
+                    "all": data,
+                    "tests": [x for x in data if x.startswith("test_")],
+                },
+            )
 
     def generate(self, sources_only: bool = False) -> None:
         """Generate ninja files."""
@@ -142,15 +152,15 @@ class NativeBuildEnvironment(LoggerMixin):
 
         # Render sources file.
         path = self.config.ninja_root.joinpath("sources.ninja")
-        with path.open("w") as path_fd:
-            outputs = self.write_source_rules(path_fd)
-            self.logger.info("Wrote '%s'.", path)
+        with self.log_time("Write '%s'", path):
+            with path.open("w") as path_fd:
+                outputs = self.write_source_rules(path_fd)
 
         # Render apps file.
         path = self.config.ninja_root.joinpath("apps.ninja")
-        with path.open("w") as path_fd:
-            elfs = self.write_app_rules(path_fd, outputs)
-            self.logger.info("Wrote '%s'.", path)
+        with self.log_time("Write '%s'", path):
+            with path.open("w") as path_fd:
+                elfs = self.write_app_rules(path_fd, outputs)
 
         # Render format file.
         render_format(self.config, sources_headers(self.sources))
