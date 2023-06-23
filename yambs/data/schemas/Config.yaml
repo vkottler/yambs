@@ -1,6 +1,7 @@
 ---
 includes:
   - config_common.yaml
+  - entry_common.yaml
 
 type: object
 additionalProperties: false
