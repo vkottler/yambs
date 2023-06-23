@@ -1,1 +1,12 @@
 ---
+cflag_groups:
+  debug: [-Og, -g]
+  opt: [-O2]
+
+variants:
+  clang:
+    cflag_groups: [debug]
+
+  clang-opt:
+    extra_cflags: [--coverage]
+    cflag_groups: [opt]

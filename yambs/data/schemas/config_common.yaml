@@ -12,18 +12,6 @@ properties:
     type: string
     default: build
 
-  cc:
-    type: string
-    default: gcc
-
-  cxx:
-    type: string
-    default: g++
-
-  ld:
-    type: string
-    default: g++
-
   common_ldflags:
     type: array
     default: ["-Wl,--gc-sections"]

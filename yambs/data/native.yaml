@@ -1,12 +1,26 @@
 ---
-variants:
-  debug:
-    extra_cflags:
-      - -g
-      # Instrument builds for coverage and other analysis.
-      - -fprofile-arcs
-      - -ftest-coverage
+cflag_groups:
+  # Instrument builds for coverage and other analysis.
+  debug: [-Og, -g, --coverage]
+  opt: [-O2]
+  asan: [-fsanitize=address]
+  msan: [-fsanitize=memory]
 
-  optimized:
-    extra_cflags:
-      - -O2
+variants:
+
+  debug:
+    cflag_groups: [asan]
+
+  opt: {}
+
+  clang:
+    cflag_groups: [debug, msan]
+    cc: clang
+    cxx: clang
+    ld: clang
+
+  clang-opt:
+    cflag_groups: [opt]
+    cc: clang
+    cxx: clang
+    ld: clang

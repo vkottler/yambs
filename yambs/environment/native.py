@@ -145,7 +145,9 @@ class NativeBuildEnvironment(LoggerMixin):
 
         if not sources_only:
             # Render templates.
-            generate_variants(self.jinja, self.config)
+            generate_variants(
+                self.jinja, self.config, self.config.data["cflag_groups"]
+            )
             self.render(self.config.root, "build.ninja")
             for template in ["all", "rules"]:
                 self.render(self.config.ninja_root, f"{template}.ninja")

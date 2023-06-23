@@ -16,6 +16,15 @@ properties:
     items:
       type: string
 
+  cflag_groups:
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^[a-zA-Z0-9-_.]+$":
+        type: array
+        items:
+          type: string
+
   variants:
     type: object
     additionalProperties: false
