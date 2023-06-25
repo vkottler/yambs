@@ -2,7 +2,7 @@
     =====================================
     generator=datazen
     version=3.1.2
-    hash=95bdb6c1d81e7a16f489c539c9297e08
+    hash=43c6b5c93300cac78f4f83b79f8c7044
     =====================================
 -->
 
@@ -23,7 +23,6 @@ See also: [generated documentation](https://vkottler.github.io/python/pydoc/yamb
 
 This package is tested with the following Python minor versions:
 
-* [`python3.7`](https://docs.python.org/3.7/)
 * [`python3.8`](https://docs.python.org/3.8/)
 * [`python3.9`](https://docs.python.org/3.9/)
 * [`python3.10`](https://docs.python.org/3.10/)
