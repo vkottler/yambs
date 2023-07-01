@@ -14,9 +14,11 @@ dev_requirements:
   - types-setuptools
 
 commands:
+  - name: dist
+    description: create a source distribution
   - name: gen
     description: poll the source tree and generate any new build files
   - name: native
     description: generate build files for native-only target projects
   - name: uf2conv
-    description: Convert to UF2 or flash directly.
+    description: convert to UF2 or flash directly

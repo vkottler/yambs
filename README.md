@@ -2,11 +2,11 @@
     =====================================
     generator=datazen
     version=3.1.2
-    hash=9a21bcfc475707c132005e45f897b988
+    hash=880db2e8ec174506360039236c025332
     =====================================
 -->
 
-# yambs ([1.9.2](https://pypi.org/project/yambs/))
+# yambs ([1.10.0](https://pypi.org/project/yambs/))
 
 [![python](https://img.shields.io/pypi/pyversions/yambs.svg)](https://pypi.org/project/yambs/)
 ![Build Status](https://github.com/vkottler/yambs/workflows/Python%20Package/badge.svg)
@@ -129,7 +129,7 @@ following a specific convention), put your configuration data here.
 ```
 $ ./venv3.11/bin/mbs -h
 
-usage: mbs [-h] [--version] [-v] [-C DIR] {gen,native,uf2conv,noop} ...
+usage: mbs [-h] [--version] [-v] [-C DIR] {dist,gen,native,uf2conv,noop} ...
 
 Yet another meta build-system.
 
@@ -140,16 +140,32 @@ options:
   -C DIR, --dir DIR     execute from a specific directory
 
 commands:
-  {gen,native,uf2conv,noop}
+  {dist,gen,native,uf2conv,noop}
                         set of available commands
+    dist                create a source distribution
     gen                 poll the source tree and generate any new build files
     native              generate build files for native-only target projects
-    uf2conv             Convert to UF2 or flash directly.
+    uf2conv             convert to UF2 or flash directly
     noop                command stub (does nothing)
 
 ```
 
 ## Sub-command Options
+
+### `dist`
+
+```
+$ ./venv3.11/bin/mbs dist -h
+
+usage: mbs dist [-h] [-c CONFIG]
+
+options:
+  -h, --help            show this help message and exit
+  -c CONFIG, --config CONFIG
+                        the path to the top-level configuration file (default:
+                        'yambs.yaml')
+
+```
 
 ### `gen`
 

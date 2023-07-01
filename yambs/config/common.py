@@ -4,7 +4,7 @@ A module for common configuration interfaces.
 
 # built-in
 from pathlib import Path
-from typing import Any, Dict, Type, TypeVar
+from typing import Any, Dict, NamedTuple, Type, TypeVar
 
 # third-party
 from vcorelib.dict import merge
@@ -16,12 +16,43 @@ from vcorelib.paths import Pathlike, find_file, normalize
 
 # internal
 from yambs import PKG_NAME
+from yambs.schemas import YambsDictCodec as _YambsDictCodec
 
 T = TypeVar("T", bound="CommonConfig")
 DEFAULT_CONFIG = f"{PKG_NAME}.yaml"
 
 
-class CommonConfig(_BasicDictCodec):
+class Project(NamedTuple):
+    """An object for managing project metadata."""
+
+    name: str
+    major: int
+    minor: int
+    patch: int
+
+    @staticmethod
+    def create(data: _JsonObject) -> "Project":
+        """Create a project instance from JSON data."""
+
+        ver = data["version"]
+        return Project(
+            data["name"],  # type: ignore
+            ver["major"],  # type: ignore
+            ver["minor"],  # type: ignore
+            ver["patch"],  # type: ignore
+        )
+
+    @property
+    def version(self) -> str:
+        """Get this project's version string."""
+        return f"{self.major}.{self.minor}.{self.patch}"
+
+    def __str__(self) -> str:
+        """Get this project as a string."""
+        return f"{self.name}-{self.version}"
+
+
+class CommonConfig(_YambsDictCodec, _BasicDictCodec):
     """A common, base configuration."""
 
     data: Dict[str, Any]
@@ -30,6 +61,7 @@ class CommonConfig(_BasicDictCodec):
     src_root: Path
     build_root: Path
     ninja_root: Path
+    dist_root: Path
 
     def directory(self, name: str, mkdir: bool = True) -> Path:
         """Get a configurable directory."""
@@ -52,6 +84,9 @@ class CommonConfig(_BasicDictCodec):
         self.src_root = self.directory("src_root")
         self.build_root = self.directory("build_root")
         self.ninja_root = self.directory("ninja_out")
+        self.dist_root = self.directory("dist_out")
+
+        self.project = Project.create(data["project"])  # type: ignore
 
     @classmethod
     def load(

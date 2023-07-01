@@ -17,8 +17,8 @@ from yambs import PKG_NAME
 from yambs.config.common import DEFAULT_CONFIG
 
 
-def add_common_args(parser: _ArgumentParser) -> None:
-    """Add common command-line arguments to a parser."""
+def add_config_arg(parser: _ArgumentParser) -> None:
+    """Add an argument for specifying a configuration file."""
 
     parser.add_argument(
         "-c",
@@ -30,6 +30,12 @@ def add_common_args(parser: _ArgumentParser) -> None:
             "file (default: '%(default)s')"
         ),
     )
+
+
+def add_common_args(parser: _ArgumentParser) -> None:
+    """Add common command-line arguments to a parser."""
+
+    add_config_arg(parser)
     parser.add_argument(
         "-i",
         "--single-pass",

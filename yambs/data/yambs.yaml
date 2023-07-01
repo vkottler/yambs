@@ -1,5 +1,6 @@
 ---
 includes:
+  - includes/common.yaml
   - includes/chips.yaml
 
 architectures:
