@@ -16,11 +16,11 @@ variants:
   clang:
     cflag_groups: [debug, msan]
     cc: clang
-    cxx: clang
-    ld: clang
+    cxx: clang++
+    ld: clang++
 
   clang-opt:
     cflag_groups: [opt]
     cc: clang
-    cxx: clang
-    ld: clang
+    cxx: clang++
+    ld: clang++
