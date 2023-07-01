@@ -22,3 +22,28 @@ properties:
     type: array
     items:
       type: string
+
+  project:
+    type: object
+    additionalProperties: false
+    properties:
+      name:
+        type: string
+        default: yambs-sample
+
+      version:
+        type: object
+        additionalProperties: false
+        properties:
+          major:
+            type: integer
+            minimum: 0
+            default: 0
+          minor:
+            type: integer
+            minimum: 1
+            default: 1
+          patch:
+            type: integer
+            minimum: 0
+            default: 0
