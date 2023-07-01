@@ -43,7 +43,7 @@ def dist_cmd(args: _Namespace) -> int:
 
         final = dist.joinpath(out.name)
         out.rename(final)
-        print("Created '{final}'.")
+        print(f"Created '{final}'.")
 
     return 0
 
