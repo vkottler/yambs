@@ -11,10 +11,9 @@ from vcorelib.io.types import JsonObject as _JsonObject
 # internal
 from yambs.config.board import Board
 from yambs.config.common import CommonConfig
-from yambs.schemas import YambsDictCodec as _YambsDictCodec
 
 
-class Config(_YambsDictCodec, CommonConfig):
+class Config(CommonConfig):
     """The top-level configuration object for the package."""
 
     board_data: List[Board]

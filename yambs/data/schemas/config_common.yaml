@@ -8,6 +8,10 @@ properties:
     type: string
     default: ninja
 
+  dist_out:
+    type: string
+    default: dist
+
   build_root:
     type: string
     default: build

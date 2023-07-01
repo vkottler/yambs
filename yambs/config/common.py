@@ -16,6 +16,7 @@ from vcorelib.paths import Pathlike, find_file, normalize
 
 # internal
 from yambs import PKG_NAME
+from yambs.schemas import YambsDictCodec as _YambsDictCodec
 
 T = TypeVar("T", bound="CommonConfig")
 DEFAULT_CONFIG = f"{PKG_NAME}.yaml"
@@ -51,7 +52,7 @@ class Project(NamedTuple):
         return f"{self.name}-{self.version}"
 
 
-class CommonConfig(_BasicDictCodec):
+class CommonConfig(_YambsDictCodec, _BasicDictCodec):
     """A common, base configuration."""
 
     data: Dict[str, Any]
@@ -60,6 +61,7 @@ class CommonConfig(_BasicDictCodec):
     src_root: Path
     build_root: Path
     ninja_root: Path
+    dist_root: Path
 
     def directory(self, name: str, mkdir: bool = True) -> Path:
         """Get a configurable directory."""
@@ -82,6 +84,7 @@ class CommonConfig(_BasicDictCodec):
         self.src_root = self.directory("src_root")
         self.build_root = self.directory("build_root")
         self.ninja_root = self.directory("ninja_out")
+        self.dist_root = self.directory("dist_out")
 
         self.project = Project.create(data["project"])  # type: ignore
 
