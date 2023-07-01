@@ -30,19 +30,26 @@ def write_format_target(stream: TextIO, paths: Iterable[Path]) -> None:
     and headers.
     """
 
+    # Actually formats sources.
     stream.write("rule clang-format" + linesep)
     stream.write("  command = clang-format -i $in" + linesep + linesep)
 
+    # Just checks formatting.
+    stream.write("rule clang-format-check" + linesep)
+    stream.write("  command = clang-format -n --Werror $in" + linesep)
+
     paths = list(paths)
     if paths:
-        line = "build format: clang-format "
-        offset = " " * len(line)
+        for suffix in ["", "-check"]:
+            stream.write(linesep)
+            line = f"build format{suffix}: clang-format{suffix} "
+            offset = " " * len(line)
 
-        stream.write(line)
-        stream.write(str(paths[0]))
+            stream.write(line)
+            stream.write(str(paths[0]))
 
-        for source in paths[1:]:
-            write_continuation(stream, offset)
-            stream.write(str(source))
+            for source in paths[1:]:
+                write_continuation(stream, offset)
+                stream.write(str(source))
 
-        stream.write(linesep)
+            stream.write(linesep)
