@@ -1,3 +1,3 @@
 datazen
-vcorelib>=1.6.8
+vcorelib>=2.2.2
 rcmpy>=1.5.0
