@@ -35,6 +35,17 @@ properties:
         type: string
         default: yambs-sample
 
+      github:
+        type: object
+        additionalProperties: false
+        required: [owner]
+        properties:
+          # If not set, fallback to project.name.
+          repo:
+            type: string
+          owner:
+            type: string
+
       version:
         type: object
         additionalProperties: false

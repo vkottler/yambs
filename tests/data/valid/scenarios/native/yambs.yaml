@@ -3,6 +3,11 @@ cflag_groups:
   debug: [-Og, -g]
   opt: [-O2]
 
+project:
+  name: yambs
+  github:
+    owner: vkottler
+
 variants:
   clang:
     cflag_groups: [debug]
