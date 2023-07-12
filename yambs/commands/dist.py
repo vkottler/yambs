@@ -5,13 +5,11 @@ An entry-point for the 'dist' command.
 # built-in
 from argparse import ArgumentParser as _ArgumentParser
 from argparse import Namespace as _Namespace
-from os import linesep
 from shutil import make_archive, rmtree
 
 # third-party
-from vcorelib import DEFAULT_ENCODING as _DEFAULT_ENCODING
 from vcorelib.args import CommandFunction as _CommandFunction
-from vcorelib.paths import file_hash_hex
+from vcorelib.paths import create_hex_digest
 from vcorelib.paths.context import in_dir
 
 # internal
@@ -53,16 +51,7 @@ def dist_cmd(args: _Namespace) -> int:
         print(f"Created '{final}'.")
 
     # Produce a hex digest.
-    algorithm = "sha256"
-    hex_digest = dist.joinpath(f"{slug}.{algorithm}")
-    with hex_digest.open("w", encoding=_DEFAULT_ENCODING) as sha_fd:
-        for archive in archives:
-            sha_fd.write(file_hash_hex(archive, algorithm=algorithm))
-            sha_fd.write(" *")
-            sha_fd.write(archive.name)
-            sha_fd.write(linesep)
-
-    print(f"Wrote '{hex_digest}'.")
+    print(f"Wrote '{create_hex_digest(dist, slug)}'.")
 
     return 0
 

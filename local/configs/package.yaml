@@ -7,7 +7,7 @@ time_command: true
 
 requirements:
   - datazen
-  - vcorelib>=2.2.2
+  - vcorelib>=2.3.1
   - rcmpy>=1.5.0
 dev_requirements:
   - setuptools-wrapper
