@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta:__legacy__"
 
 [project]
 name = "yambs"
-version = "1.10.3"
+version = "1.10.4"
 description = "Yet another meta build-system."
 readme = "README.md"
 requires-python = ">=3.8"
