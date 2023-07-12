@@ -4,7 +4,7 @@ A module for common configuration interfaces.
 
 # built-in
 from pathlib import Path
-from typing import Any, Dict, NamedTuple, Type, TypeVar
+from typing import Any, Dict, NamedTuple, Optional, Type, TypeVar
 
 # third-party
 from vcorelib.dict import merge
@@ -30,16 +30,27 @@ class Project(NamedTuple):
     minor: int
     patch: int
 
+    # GitHub attributes.
+    repo: str
+    owner: Optional[str]
+
     @staticmethod
     def create(data: _JsonObject) -> "Project":
         """Create a project instance from JSON data."""
 
         ver = data["version"]
+
+        name: str = data["name"]  # type: ignore
+        github: Dict[str, str] = data.get("github", {})  # type: ignore
+        github.setdefault("repo", name)
+
         return Project(
-            data["name"],  # type: ignore
+            name,
             ver["major"],  # type: ignore
             ver["minor"],  # type: ignore
             ver["patch"],  # type: ignore
+            github["repo"],
+            github.get("owner"),
         )
 
     @property

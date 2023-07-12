@@ -11,16 +11,14 @@ from vcorelib.args import CommandFunction as _CommandFunction
 
 # internal
 from yambs.commands.common import add_common_args, run_watch
-from yambs.config.native import Native
+from yambs.config.native import load_native
 from yambs.environment.native import NativeBuildEnvironment
 
 
 def native_cmd(args: _Namespace) -> int:
     """Execute the native command."""
 
-    config = Native.load(
-        path=args.config, root=args.dir, package_config="native.yaml"
-    )
+    config = load_native(path=args.config, root=args.dir)
 
     NativeBuildEnvironment(config).generate(sources_only=args.sources)
 
