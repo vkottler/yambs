@@ -10,6 +10,7 @@ from typing import NamedTuple, Optional
 
 HEADER_EXTENSIONS = {".h", ".hpp"}
 BUILD_DIR_VAR = "$build_dir"
+BUILD_DIR_PATH = Path(BUILD_DIR_VAR)
 
 
 class SourceTranslator(NamedTuple):

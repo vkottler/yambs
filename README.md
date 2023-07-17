@@ -2,11 +2,11 @@
     =====================================
     generator=datazen
     version=3.1.2
-    hash=7b491a6ae08910955ce5d652d62d907f
+    hash=002bf1ec758c597d37da825e56ca08c0
     =====================================
 -->
 
-# yambs ([1.10.5](https://pypi.org/project/yambs/))
+# yambs ([2.0.0](https://pypi.org/project/yambs/))
 
 [![python](https://img.shields.io/pypi/pyversions/yambs.svg)](https://pypi.org/project/yambs/)
 ![Build Status](https://github.com/vkottler/yambs/workflows/Python%20Package/badge.svg)
@@ -157,13 +157,14 @@ commands:
 ```
 $ ./venv3.11/bin/mbs dist -h
 
-usage: mbs dist [-h] [-c CONFIG]
+usage: mbs dist [-h] [-c CONFIG] [-s]
 
 options:
   -h, --help            show this help message and exit
   -c CONFIG, --config CONFIG
                         the path to the top-level configuration file (default:
                         'yambs.yaml')
+  -s, --sources         set this flag to only capture source files
 
 ```
 

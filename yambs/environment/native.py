@@ -18,12 +18,12 @@ from yambs.generate.common import get_jinja, render_template
 from yambs.generate.ninja import write_continuation
 from yambs.generate.ninja.format import render_format
 from yambs.generate.variants import generate as generate_variants
-from yambs.translation import BUILD_DIR_VAR, get_translator
+from yambs.translation import BUILD_DIR_PATH, get_translator
 
 
 def resolve_build_dir(build_root: Path, variant: str, path: Path) -> Path:
     """Resolve the build-directory variable in a path."""
-    return build_root.joinpath(variant, path.relative_to(BUILD_DIR_VAR))
+    return build_root.joinpath(variant, path.relative_to(BUILD_DIR_PATH))
 
 
 class NativeBuildEnvironment(LoggerMixin):
@@ -71,6 +71,25 @@ class NativeBuildEnvironment(LoggerMixin):
         """Write source rules."""
         return {self.write_compile_line(stream, path) for path in self.regular}
 
+    def write_static_library_rule(
+        self, stream: TextIO, outputs: Set[Path]
+    ) -> Path:
+        """Create a rule for a static library output."""
+
+        lib = BUILD_DIR_PATH.joinpath(f"{self.config.project}.a")
+        line = f"build {lib}: ar "
+        offset = " " * len(line)
+
+        list_outputs = list(outputs)
+        stream.write(line + str(list_outputs[0]))
+        for file in list_outputs[1:]:
+            write_continuation(stream, offset)
+            stream.write(str(file))
+
+        stream.write(linesep + linesep)
+
+        return lib
+
     def write_app_rules(
         self, stream: TextIO, outputs: Set[Path]
     ) -> Dict[Path, Path]:
@@ -78,11 +97,12 @@ class NativeBuildEnvironment(LoggerMixin):
 
         elfs: Dict[Path, Path] = {}
 
+        # Create rules for linked executables.
         for path in self.apps:
             out = self.write_compile_line(stream, path)
 
             from_src = path.relative_to(self.config.src_root)
-            elf = Path(BUILD_DIR_VAR, from_src.with_suffix(".elf"))
+            elf = BUILD_DIR_PATH.joinpath(from_src.with_suffix(".elf"))
             elfs[path] = elf
             line = f"build {elf}: link "
             offset = " " * len(line)
@@ -99,6 +119,12 @@ class NativeBuildEnvironment(LoggerMixin):
         offset = " " * len(line)
 
         elfs_list = list(elfs.values())
+
+        # Also update the static library (if necessary) when linking
+        # applications.
+        if outputs:
+            elfs_list.append(self.write_static_library_rule(stream, outputs))
+
         stream.write(line + str(elfs_list[0]))
         for elf in elfs_list[1:]:
             write_continuation(stream, offset)

@@ -21,6 +21,19 @@ def test_dist_command_basic():
                     "-C",
                     str(resource("scenarios", scenario)),
                     "dist",
+                    "-s",
+                ]
+            )
+            == 0
+        )
+
+        assert (
+            yambs_main(
+                [
+                    PKG_NAME,
+                    "-C",
+                    str(resource("scenarios", scenario)),
+                    "dist",
                 ]
             )
             == 0

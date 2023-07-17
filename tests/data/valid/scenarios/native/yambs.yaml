@@ -3,6 +3,8 @@ cflag_groups:
   debug: [-Og, -g]
   opt: [-O2]
 
+extra_dist: [extra]
+
 project:
   name: yambs
   github:

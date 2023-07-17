@@ -5,16 +5,18 @@ An entry-point for the 'dist' command.
 # built-in
 from argparse import ArgumentParser as _ArgumentParser
 from argparse import Namespace as _Namespace
-from shutil import make_archive, rmtree
+from pathlib import Path
+from shutil import copytree, rmtree
+from tempfile import TemporaryDirectory
 
 # third-party
 from vcorelib.args import CommandFunction as _CommandFunction
 from vcorelib.paths import create_hex_digest
-from vcorelib.paths.context import in_dir
 
 # internal
 from yambs.commands.common import add_config_arg
 from yambs.config.common import CommonConfig
+from yambs.dist import copy_source_tree, make_archives
 
 
 def dist_cmd(args: _Namespace) -> int:
@@ -22,36 +24,28 @@ def dist_cmd(args: _Namespace) -> int:
 
     config = CommonConfig.load(path=args.config, root=args.dir)
 
-    # Remove and re-create the dist directory.
-    dist = config.dist_root
-    rmtree(dist, ignore_errors=True)
-    dist.mkdir()
+    # Prepare a temporary directory with project sources.
+    with TemporaryDirectory() as tmp:
+        path = Path(tmp)
 
-    slug = str(config.project)
-    src = config.src_root
-    archives = []
+        # Put everything under a directory named after the project.
+        base = path.joinpath(config.project.name)
 
-    for ext, kind in [
-        ("tar.gz", "gztar"),
-        ("tar.xz", "xztar"),
-        ("zip", "zip"),
-    ]:
-        out = src.joinpath(f"{slug}.{ext}")
-        out.unlink(missing_ok=True)
+        if args.sources:
+            copytree(config.src_root, base)
+        else:
+            base.mkdir()
+            copy_source_tree(config, base)
 
-        with in_dir(src):
-            make_archive(slug, kind)
+        # Remove and re-create the dist directory.
+        dist = config.dist_root
+        rmtree(dist, ignore_errors=True)
+        dist.mkdir()
 
-        assert out.is_file(), out
-
-        final = dist.joinpath(out.name)
-        out.rename(final)
-        archives.append(final)
-
-        print(f"Created '{final}'.")
+        make_archives(path, config)
 
     # Produce a hex digest.
-    print(f"Wrote '{create_hex_digest(dist, slug)}'.")
+    print(f"Wrote '{create_hex_digest(dist, str(config.project))}'.")
 
     return 0
 
@@ -60,4 +54,10 @@ def add_dist_cmd(parser: _ArgumentParser) -> _CommandFunction:
     """Add dist-command arguments to its parser."""
 
     add_config_arg(parser)
+    parser.add_argument(
+        "-s",
+        "--sources",
+        action="store_true",
+        help="set this flag to only capture source files",
+    )
     return dist_cmd

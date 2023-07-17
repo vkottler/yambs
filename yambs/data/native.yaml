@@ -3,8 +3,8 @@ includes:
   - includes/common.yaml
 
 cflag_groups:
-  # Compile position-independent so we can build shared objects.
-  common: [-fPIC]
+  # Compile position-independent to build shared objects.
+  pic: [-fPIC]
 
   # Instrument builds for coverage and other analysis.
   debug: [-Og, -g, --coverage]
@@ -15,19 +15,18 @@ cflag_groups:
 variants:
 
   debug:
-    cflag_groups: [common, asan]
+    cflag_groups: [asan]
 
-  opt:
-    cflag_groups: [common]
+  opt: {}
 
   clang:
-    cflag_groups: [common, debug, msan]
+    cflag_groups: [debug, msan]
     cc: clang
     cxx: clang++
     ld: clang++
 
   clang-opt:
-    cflag_groups: [common, opt]
+    cflag_groups: [opt]
     cc: clang
     cxx: clang++
     ld: clang++
