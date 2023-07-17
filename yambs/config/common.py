@@ -74,6 +74,8 @@ class CommonConfig(_YambsDictCodec, _BasicDictCodec):
     ninja_root: Path
     dist_root: Path
 
+    file: Optional[Path]
+
     def directory(self, name: str, mkdir: bool = True) -> Path:
         """Get a configurable directory."""
 
@@ -97,6 +99,8 @@ class CommonConfig(_YambsDictCodec, _BasicDictCodec):
         self.ninja_root = self.directory("ninja_out")
         self.dist_root = self.directory("dist_out")
 
+        self.file = None
+
         self.project = Project.create(data["project"])  # type: ignore
 
     @classmethod
@@ -111,6 +115,8 @@ class CommonConfig(_YambsDictCodec, _BasicDictCodec):
         src_config = find_file(package_config, package=PKG_NAME)
         assert src_config is not None
 
+        path = normalize(path)
+
         data = merge(
             _ARBITER.decode(
                 src_config,
@@ -124,6 +130,9 @@ class CommonConfig(_YambsDictCodec, _BasicDictCodec):
         )
 
         result = cls.create(data)
+
+        if path.is_file():
+            result.file = path
 
         if root is not None:
             result.root = normalize(root)

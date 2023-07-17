@@ -3,6 +3,9 @@ includes:
   - includes/common.yaml
 
 cflag_groups:
+  # Compile position-independent to build shared objects.
+  pic: [-fPIC]
+
   # Instrument builds for coverage and other analysis.
   debug: [-Og, -g, --coverage]
   opt: [-O2]

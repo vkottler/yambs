@@ -18,4 +18,7 @@ ldflags ={% for flag in common_ldflags %} {{flag}}{% endfor %}
 rule link
   command = $ld $cflags $ldflags -Wl,-Map=$out.map $in -o $out
 
+rule ar
+  command = ar rcs $out $in
+
 build_dir = {{build_root}}/$variant

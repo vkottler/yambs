@@ -22,7 +22,7 @@ properties:
     items:
       type: string
 
-  extra_third_party:
+  extra_dist:
     type: array
     items:
       type: string

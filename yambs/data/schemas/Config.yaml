@@ -43,3 +43,8 @@ properties:
     patternProperties:
       "^[a-zA-Z0-9-_.+]+$":
         $ref: package://yambs/schemas/Architecture.yaml
+
+  extra_third_party:
+    type: array
+    items:
+      type: string
