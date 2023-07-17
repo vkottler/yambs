@@ -34,7 +34,7 @@ def make_archives(tmp: Path, config: CommonConfig) -> None:
         assert out.is_file(), out
 
         final = config.dist_root.joinpath(out.name)
-        out.rename(final)
+        out.rename(final.resolve())
 
         print(f"Created '{final}'.")
 
