@@ -1,7 +1,6 @@
 ---
 includes:
   - toolchain_common.yaml
-  - targets_common.yaml
   - entry_common.yaml
 
 type: object
@@ -13,3 +12,7 @@ properties:
     default: []
     items:
       type: string
+
+  targets:
+    type: array
+    default: [apps, lib]

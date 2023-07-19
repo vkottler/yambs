@@ -1,7 +1,4 @@
 ---
-includes:
-  - targets_common.yaml
-
 type: object
 additionalProperties: false
 required: [name, chip]
@@ -29,3 +26,7 @@ properties:
     default: []
     items:
       type: string
+
+  targets:
+    type: array
+    default: [apps]
