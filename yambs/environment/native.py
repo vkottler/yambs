@@ -120,10 +120,14 @@ class NativeBuildEnvironment(LoggerMixin):
 
         elfs_list = list(elfs.values())
 
-        # Also update the static library (if necessary) when linking
-        # applications.
+        # Add a phony target for creating a static library.
         if outputs:
-            elfs_list.append(self.write_static_library_rule(stream, outputs))
+            stream.write(
+                "build ${variant}_lib: phony "
+                + str(self.write_static_library_rule(stream, outputs))
+                + linesep
+                + linesep
+            )
 
         stream.write(line + str(elfs_list[0]))
         for elf in elfs_list[1:]:

@@ -11,12 +11,13 @@ from tempfile import TemporaryDirectory
 
 # third-party
 from vcorelib.args import CommandFunction as _CommandFunction
+from vcorelib.io import ARBITER
 from vcorelib.paths import create_hex_digest
 
 # internal
 from yambs.commands.common import add_config_arg
 from yambs.config.common import CommonConfig
-from yambs.dist import copy_source_tree, make_archives
+from yambs.dist import copy_source_tree, dist_metadata, make_archives
 
 
 def dist_cmd(args: _Namespace) -> int:
@@ -36,6 +37,9 @@ def dist_cmd(args: _Namespace) -> int:
         else:
             base.mkdir()
             copy_source_tree(config, base)
+
+        # Add JSON metadata.
+        ARBITER.encode(base.joinpath("dist.json"), dist_metadata())
 
         # Remove and re-create the dist directory.
         dist = config.dist_root

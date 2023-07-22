@@ -16,4 +16,4 @@ include $include_dir/rules.ninja
 include $include_dir/sources.ninja
 include $include_dir/apps.ninja
 
-build $variant: phony{% for task in targets %} {{name}}_{{task}}{% endfor %}
+build $variant: phony{% for task in targets %} ${variant}_{{task}}{% endfor %}
