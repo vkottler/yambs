@@ -65,7 +65,7 @@ jobs:
 
       - run: |
           mk python-release owner=vkottler \
-                            repo=yambs version=2.1.0
+                            repo=yambs version=2.1.1
         if: |
           matrix.python-version == '3.11'
           && matrix.system == 'ubuntu-latest'
