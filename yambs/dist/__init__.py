@@ -5,11 +5,13 @@ A module implementing interfaces for facilitating project distribution.
 # built-in
 from pathlib import Path
 from shutil import copy2, copytree, make_archive
+from typing import Any, Dict
 
 # third-party
 from vcorelib.paths.context import in_dir
 
 # internal
+from yambs import VERSION
 from yambs.config.common import CommonConfig
 
 ARCHIVES = [
@@ -63,3 +65,8 @@ def copy_source_tree(config: CommonConfig, dest: Path) -> None:
             copytree(item, dest.joinpath(item.name))
         else:
             copy2(item, dest.joinpath(item.name))
+
+
+def dist_metadata() -> Dict[str, Any]:
+    """Get metadata for packaged distributions."""
+    return {"yambs_version": VERSION}
