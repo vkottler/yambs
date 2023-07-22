@@ -29,8 +29,9 @@ def dist_cmd(args: _Namespace) -> int:
     with TemporaryDirectory() as tmp:
         path = Path(tmp)
 
-        # Put everything under a directory named after the project.
-        base = path.joinpath(config.project.name)
+        # Put everything under a directory named after the project slug (name
+        # and version).
+        base = path.joinpath(str(config.project))
 
         if args.sources:
             copytree(config.src_root, base)
