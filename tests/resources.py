@@ -12,3 +12,7 @@ def resource(resource_name: str, *parts: str, valid: bool = True) -> Path:
     return Path(__file__).parent.joinpath(
         "data", "valid" if valid else "invalid", resource_name, *parts
     )
+
+
+OWNER = "vkottler"
+REPO = "yambs-sample"

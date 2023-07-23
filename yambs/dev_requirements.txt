@@ -7,3 +7,4 @@ isort
 yamllint
 setuptools-wrapper
 types-setuptools
+types-requests
