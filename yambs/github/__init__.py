@@ -3,6 +3,7 @@ A module for working with GitHub releases.
 """
 
 # built-in
+import os
 from typing import Any, Dict
 from urllib.parse import ParseResult
 
@@ -49,14 +50,33 @@ def latest_repo_release_api_url(owner: str, repo: str) -> str:
     ).geturl()
 
 
+GIHTUB_HEADERS = {
+    "Accept": "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+}
+
+
+def check_api_token() -> None:
+    """Check for a GitHub API token set via the environment."""
+
+    if "Authorization" not in GIHTUB_HEADERS:
+        if "GITHUB_API_TOKEN" in os.environ:
+            GIHTUB_HEADERS[
+                "Authorization"
+            ] = f"Bearer {os.environ['GITHUB_API_TOKEN']}"
+
+
 def latest_release_data(
     owner: str, repo: str, *args, timeout: float = None, **kwargs
 ) -> Dict[str, Any]:
     """Get latest-release data."""
 
+    check_api_token()
+
     return requests.get(  # type: ignore
         latest_repo_release_api_url(owner, repo),
         *args,
         timeout=timeout,
+        headers=GIHTUB_HEADERS,
         **kwargs,
     ).json()
