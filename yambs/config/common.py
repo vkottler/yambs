@@ -4,18 +4,19 @@ A module for common configuration interfaces.
 
 # built-in
 from pathlib import Path
-from typing import Any, Dict, NamedTuple, Optional, Type, TypeVar
+from typing import Any, Dict, NamedTuple, Optional, Set, Type, TypeVar
 
 # third-party
 from vcorelib.dict import merge
 from vcorelib.dict.codec import BasicDictCodec as _BasicDictCodec
 from vcorelib.io import ARBITER as _ARBITER
 from vcorelib.io import DEFAULT_INCLUDES_KEY
-from vcorelib.io.types import JsonObject as _JsonObject
+from vcorelib.io import JsonObject as _JsonObject
 from vcorelib.paths import Pathlike, find_file, normalize
 
 # internal
 from yambs import PKG_NAME
+from yambs.dependency.config import Dependency
 from yambs.schemas import YambsDictCodec as _YambsDictCodec
 
 T = TypeVar("T", bound="CommonConfig")
@@ -73,6 +74,7 @@ class CommonConfig(_YambsDictCodec, _BasicDictCodec):
     build_root: Path
     ninja_root: Path
     dist_root: Path
+    third_party_root: Path
 
     file: Optional[Path]
 
@@ -98,10 +100,18 @@ class CommonConfig(_YambsDictCodec, _BasicDictCodec):
         self.build_root = self.directory("build_root")
         self.ninja_root = self.directory("ninja_out")
         self.dist_root = self.directory("dist_out")
+        self.third_party_root = self.directory("third_party_root")
 
         self.file = None
 
         self.project = Project.create(data["project"])  # type: ignore
+
+        # Collect project dependency data.
+        self.dependencies: Set[Dependency] = set()
+        for dep in data.get("dependencies", []):  # type: ignore
+            new_dep = Dependency(data=dep, verify=False)  # type: ignore
+            new_dep.github.setdefault("owner", self.project.owner)
+            self.dependencies.add(new_dep)
 
     @classmethod
     def load(

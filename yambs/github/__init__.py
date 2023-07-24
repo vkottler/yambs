@@ -2,13 +2,20 @@
 A module for working with GitHub releases.
 """
 
-from typing import Any, Dict
-
 # built-in
+from typing import Any, Dict
 from urllib.parse import ParseResult
 
 # third-party
 import requests
+from vcorelib.dict.codec import BasicDictCodec as _BasicDictCodec
+
+# internal
+from yambs.schemas import YambsDictCodec as _YambsDictCodec
+
+
+class Github(_YambsDictCodec, _BasicDictCodec):
+    """GitHub repository information."""
 
 
 def github_url(

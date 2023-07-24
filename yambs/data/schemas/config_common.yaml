@@ -12,6 +12,10 @@ properties:
     type: string
     default: dist
 
+  third_party_root:
+    type: string
+    default: third-party
+
   build_root:
     type: string
     default: build
@@ -28,37 +32,9 @@ properties:
       type: string
 
   project:
-    type: object
-    additionalProperties: false
-    properties:
-      name:
-        type: string
-        default: yambs-sample
+    $ref: package://yambs/schemas/Project.yaml
 
-      github:
-        type: object
-        additionalProperties: false
-        required: [owner]
-        properties:
-          # If not set, fallback to project.name.
-          repo:
-            type: string
-          owner:
-            type: string
-
-      version:
-        type: object
-        additionalProperties: false
-        properties:
-          major:
-            type: integer
-            minimum: 0
-            default: 0
-          minor:
-            type: integer
-            minimum: 1
-            default: 1
-          patch:
-            type: integer
-            minimum: 0
-            default: 0
+  dependencies:
+    type: array
+    items:
+      $ref: package://yambs/schemas/Dependency.yaml
