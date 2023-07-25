@@ -14,6 +14,7 @@ from vcorelib.logging import LoggerMixin
 # internal
 from yambs.aggregation import collect_files, populate_sources, sources_headers
 from yambs.config.native import Native
+from yambs.dependency.manager import DependencyManager
 from yambs.generate.common import get_jinja, render_template
 from yambs.generate.ninja import write_continuation
 from yambs.generate.ninja.format import render_format
@@ -35,6 +36,10 @@ class NativeBuildEnvironment(LoggerMixin):
         super().__init__()
 
         self.config = config
+
+        self.dependency_manager = DependencyManager(
+            self.config.third_party_root
+        )
 
         # Collect sources.
         self.sources = collect_files(config.src_root)
@@ -181,6 +186,10 @@ class NativeBuildEnvironment(LoggerMixin):
             self.render(self.config.root, "build.ninja")
             for template in ["all", "rules"]:
                 self.render(self.config.ninja_root, f"{template}.ninja")
+
+            # Audit dependencies.
+            for dep in self.config.dependencies:
+                self.dependency_manager.audit(dep)
 
         # Render sources file.
         path = self.config.ninja_root.joinpath("sources.ninja")
