@@ -4,7 +4,7 @@ A module for working with dependency configurations.
 
 # built-in
 from enum import StrEnum, auto
-from typing import Dict, cast
+from typing import Any, Dict, Optional, cast
 
 # third-party
 from vcorelib.dict.codec import BasicDictCodec as _BasicDictCodec
@@ -26,6 +26,9 @@ class DependencySource(StrEnum):
     GITHUB = auto()
 
 
+DependencyData = Dict[str, Any]
+
+
 class Dependency(_YambsDictCodec, _BasicDictCodec):
     """A class for describing project dependencies."""
 
@@ -45,4 +48,7 @@ class Dependency(_YambsDictCodec, _BasicDictCodec):
 
         self.kind = DependencyKind(cast(str, data["kind"]))
         self.source = DependencySource(cast(str, data["source"]))
-        self.github: Dict[str, str] = data.get("github", {})  # type: ignore
+        self.github: Dict[str, Optional[str]] = data.get(
+            "github",
+            {},  # type: ignore
+        )
