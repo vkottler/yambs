@@ -3,7 +3,7 @@ Test the 'commands.gen' module.
 """
 
 # internal
-from tests.resources import resource
+from tests.resources import clean_scenario
 
 # module under test
 from yambs import PKG_NAME
@@ -18,11 +18,15 @@ def test_gen_command_basic():
             [
                 PKG_NAME,
                 "-C",
-                str(resource("scenarios", "sample")),
+                str(clean_scenario("sample")),
                 "gen",
                 "-w",
                 "-i",
             ]
         )
         == 0
+    )
+
+    assert (
+        yambs_main([PKG_NAME, "-C", str(clean_scenario("sample")), "gen"]) == 0
     )

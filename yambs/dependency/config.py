@@ -4,7 +4,7 @@ A module for working with dependency configurations.
 
 # built-in
 from enum import StrEnum, auto
-from typing import Dict, Optional, cast
+from typing import Dict, cast
 
 # third-party
 from vcorelib.dict.codec import BasicDictCodec as _BasicDictCodec
@@ -29,15 +29,20 @@ class DependencySource(StrEnum):
 class Dependency(_YambsDictCodec, _BasicDictCodec):
     """A class for describing project dependencies."""
 
+    def __str__(self) -> str:
+        """Get this dependency as a string."""
+
+        # Change this when other sources are supported.
+        assert self.source == DependencySource.GITHUB
+        return f"{self.github['owner']}-{self.github['repo']}"
+
     def __hash__(self) -> int:
         """Compute a hash for this dependency."""
-        return hash(f"{self.github['owner']}-{self.github['repo']}")
+        return hash(str(self))
 
     def init(self, data: _JsonObject) -> None:
         """Initialize this instance."""
 
         self.kind = DependencyKind(cast(str, data["kind"]))
         self.source = DependencySource(cast(str, data["source"]))
-        self.github: Dict[str, Optional[str]] = data.get(
-            "github", {}  # type: ignore
-        )
+        self.github: Dict[str, str] = data.get("github", {})  # type: ignore

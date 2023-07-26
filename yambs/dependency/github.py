@@ -9,17 +9,22 @@ from typing import Dict
 from vcorelib.logging import LoggerMixin
 
 # internal
-from yambs.github import latest_release_data
+from yambs.github import ReleaseData, latest_release_data
 
 
 class GithubDependency(LoggerMixin):
     """A class for managing GitHub dependencies."""
 
-    def __init__(self, owner: str, repo: str, *args, **kwargs) -> None:
+    def __init__(
+        self, owner: str, repo: str, *args, data: ReleaseData = None, **kwargs
+    ) -> None:
         """Initialize this instance."""
 
         super().__init__(logger_name=f"{owner}.{repo}")
-        self.data = latest_release_data(owner, repo, *args, **kwargs)
+
+        if data is None:
+            data = latest_release_data(owner, repo, *args, **kwargs)
+        self.data = data
 
         self.logger.info(
             "Loaded release '%s' (%s).",

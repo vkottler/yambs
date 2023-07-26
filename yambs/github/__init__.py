@@ -66,9 +66,12 @@ def check_api_token() -> None:
             ] = f"Bearer {os.environ['GITHUB_API_TOKEN']}"
 
 
+ReleaseData = Dict[str, Any]
+
+
 def latest_release_data(
     owner: str, repo: str, *args, timeout: float = None, **kwargs
-) -> Dict[str, Any]:
+) -> ReleaseData:
     """Get latest-release data."""
 
     check_api_token()
