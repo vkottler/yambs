@@ -17,6 +17,7 @@ from yambs.dependency.config import (
     DependencySource,
 )
 from yambs.dependency.github import GithubDependency
+from yambs.dependency.handlers.types import DependencyTask
 from yambs.dependency.state import DependencyState
 
 TARBALL = ".tar.xz"
@@ -82,7 +83,8 @@ def audit_extract(root: Path, data: DependencyData) -> Path:
 
         # The name of the project is the directory name without the version
         # suffix.
-        data["name"] = expected.name.replace(f"-{data['version']}", "")
+        data["slug"] = expected.name
+        data["name"] = data["slug"].replace(f"-{data['version']}", "")
 
         # check if need to un-archive, if so, verify checksum.
         if not expected.is_dir():
@@ -111,22 +113,40 @@ def audit_extract(root: Path, data: DependencyData) -> Path:
     return name_link
 
 
-def yambs_handler(
-    root: Path, dep: Dependency, current: DependencyState, data: DependencyData
-) -> DependencyState:
+def yambs_handler(task: DependencyTask) -> DependencyState:
     """Handle a yambs dependency."""
 
     # No other source implementations currently.
-    assert dep.source == DependencySource.GITHUB
+    assert task.dep.source == DependencySource.GITHUB
 
-    github = github_release(dep, data)
-    audit_downloads(root, data, github)
+    github = github_release(task.dep, task.data)
+    audit_downloads(task.root, task.data, github)
+    directory = audit_extract(task.root, task.data)
 
-    command = f"ninja -C {audit_extract(root, data)} {dep.target}_lib"
+    static_lib = directory.joinpath(
+        "build", task.dep.target, f"{task.data['slug']}.a"
+    )
+    task.data["static_library"] = str(static_lib)
 
-    # Ensure the configured target is built.
-    # ninja rule to build?
-    print(command)
+    if not static_lib.is_file():
+        # Add a build command if the library still needs to be built.
+        task.build_commands.append(
+            ["ninja", "-C", str(directory), f"{task.dep.target}_lib"]
+        )
 
-    print(current)
-    return current
+    # Ensure the final static library is linked within the static directory.
+    static_include = task.static.joinpath(static_lib.name)
+    if not static_include.is_symlink():
+        static_include.symlink_to(
+            Path("..", static_lib.relative_to(task.root))
+        )
+
+    # Ensure this dependency's static library gets linked.
+    task.link_flags.append(f"-l{task.data['slug']}")
+
+    # Ensure the 'src' directory is linked within the include directory.
+    src_include = task.include.joinpath(task.data["name"])
+    if not src_include.is_symlink():
+        src_include.symlink_to(Path("..", task.data["name"], "src"))
+
+    return task.current

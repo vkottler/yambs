@@ -190,7 +190,9 @@ class NativeBuildEnvironment(LoggerMixin):
             # Audit dependencies.
             for dep in self.config.dependencies:
                 self.dependency_manager.audit(dep)
-            self.dependency_manager.save()
+            self.dependency_manager.save(logger=self.logger)
+
+            # Try to run build commands?
 
         # Render sources file.
         path = self.config.ninja_root.joinpath("sources.ninja")
