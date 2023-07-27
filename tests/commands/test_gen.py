@@ -13,20 +13,7 @@ from yambs.entry import main as yambs_main
 def test_gen_command_basic():
     """Test the 'gen' command."""
 
-    assert (
-        yambs_main(
-            [
-                PKG_NAME,
-                "-C",
-                str(clean_scenario("sample")),
-                "gen",
-                "-w",
-                "-i",
-            ]
-        )
-        == 0
-    )
+    path = str(clean_scenario("sample"))
 
-    assert (
-        yambs_main([PKG_NAME, "-C", str(clean_scenario("sample")), "gen"]) == 0
-    )
+    assert yambs_main([PKG_NAME, "-C", path, "gen", "-w", "-i"]) == 0
+    assert yambs_main([PKG_NAME, "-C", path, "gen"]) == 0
