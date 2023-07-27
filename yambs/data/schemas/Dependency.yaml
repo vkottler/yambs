@@ -12,5 +12,9 @@ properties:
     enum: [github]
     default: github
 
+  target:
+    type: string
+    default: opt
+
   github:
     $ref: package://yambs/schemas/Github.yaml

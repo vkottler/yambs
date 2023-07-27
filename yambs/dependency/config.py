@@ -52,3 +52,4 @@ class Dependency(_YambsDictCodec, _BasicDictCodec):
             "github",
             {},  # type: ignore
         )
+        self.target: str = data["target"]  # type: ignore

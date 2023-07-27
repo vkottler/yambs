@@ -70,7 +70,7 @@ def github_release(dep: Dependency, data: DependencyData) -> GithubDependency:
     return github
 
 
-def audit_extract(root: Path, data: DependencyData) -> str:
+def audit_extract(root: Path, data: DependencyData) -> Path:
     """
     Ensure the release is extracted (and the archive contents are verified).
     """
@@ -97,7 +97,18 @@ def audit_extract(root: Path, data: DependencyData) -> str:
         data["directory"] = str(expected)
 
     assert "name" in data
-    return data["directory"]  # type: ignore
+
+    # Link 'name' to the destination directory.
+    dest_dir = Path(data["directory"])
+    name_link = dest_dir.with_name(data["name"])
+    if (
+        not name_link.is_symlink()
+        or str(name_link.readlink()) != dest_dir.name
+    ):
+        name_link.unlink(missing_ok=True)
+        name_link.symlink_to(dest_dir.name)
+
+    return name_link
 
 
 def yambs_handler(
@@ -110,8 +121,12 @@ def yambs_handler(
 
     github = github_release(dep, data)
     audit_downloads(root, data, github)
-    directory = Path(audit_extract(root, data))
-    print(directory)
+
+    command = f"ninja -C {audit_extract(root, data)} {dep.target}_lib"
+
+    # Ensure the configured target is built.
+    # ninja rule to build?
+    print(command)
 
     print(current)
     return current
