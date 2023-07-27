@@ -8,6 +8,7 @@ from pathlib import Path
 # third-party
 import requests
 from vcorelib.io.archive import extractall
+from vcorelib.paths import validate_hex_digest
 
 # internal
 from yambs.dependency.config import (
@@ -85,7 +86,7 @@ def audit_extract(root: Path, data: DependencyData) -> str:
 
         # check if need to un-archive, if so, verify checksum.
         if not expected.is_dir():
-            # verify checksum
+            validate_hex_digest(data["assets"]["sum"], root=root)
             assert extractall(
                 data["assets"][TARBALL],
                 dst=root,
