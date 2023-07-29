@@ -8,7 +8,7 @@ extra_dist: [extra]
 project:
   name: yambs
   github:
-    owner: vkottler
+    owner: &self vkottler
 
 variants:
   clang:
@@ -17,3 +17,6 @@ variants:
   clang-opt:
     extra_cflags: [--coverage]
     cflag_groups: [opt]
+
+dependencies:
+  - github: {repo: yambs-sample, owner: *self}

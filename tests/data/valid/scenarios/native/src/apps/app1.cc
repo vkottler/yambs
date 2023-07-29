@@ -1,6 +1,9 @@
 /* toolchain */
 #include <iostream>
 
+/* third-party */
+#include "yambs-sample/example/sample.h"
+
 int test1(int a, int b) { return a + b; }
 
 int main(void) {
@@ -12,6 +15,10 @@ int main(void) {
     a /= 2.0f;
     std::cout << a << std::endl;
   }
+
+  Example::method1();
+  Example::method2();
+  Example::method3();
 
   return 0;
 }

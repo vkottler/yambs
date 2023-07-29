@@ -1,7 +1,7 @@
 # =====================================
 # generator=datazen
 # version=3.1.2
-# hash=415bd9ff93df6a22da8865350f34d17d
+# hash=fcb2cb10f781fa83974f986d304e773c
 # =====================================
 
 """
@@ -10,4 +10,4 @@ Useful defaults and other package metadata.
 
 DESCRIPTION = "Yet another meta build-system."
 PKG_NAME = "yambs"
-VERSION = "2.1.1"
+VERSION = "2.2.0"

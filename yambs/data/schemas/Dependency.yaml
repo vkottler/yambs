@@ -1,0 +1,20 @@
+---
+type: object
+additionalProperties: false
+properties:
+  kind:
+    type: string
+    enum: [yambs]
+    default: yambs
+
+  source:
+    type: string
+    enum: [github]
+    default: github
+
+  target:
+    type: string
+    default: opt
+
+  github:
+    $ref: package://yambs/schemas/Github.yaml

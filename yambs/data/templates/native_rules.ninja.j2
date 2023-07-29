@@ -16,9 +16,16 @@ ldflags ={% for flag in common_ldflags %} {{flag}}{% endfor %}
 {% endif %}
 
 rule link
-  command = $ld $cflags $ldflags -Wl,-Map=$out.map $in -o $out
+  command = $ld $cflags -Wl,-Map=$out.map $in $ldflags -o $out
 
 rule ar
   command = ar rcs $out $in
 
 build_dir = {{build_root}}/$variant
+
+rule script
+  command = /bin/bash $in $out
+
+build $build_dir/third_party.txt: script $third_party_dir/third_party.sh
+
+build ${variant}_third_party: phony $build_dir/third_party.txt
