@@ -14,3 +14,8 @@ htmlcov
 coverage*.xml
 tags
 third-party
+
+ninja
+build.ninja
+.ninja*
+compile_commands.json

@@ -2,6 +2,14 @@
 Test the 'commands.native' module.
 """
 
+# built-in
+from shutil import which
+from subprocess import run
+from sys import platform
+
+# third-party
+from vcorelib.paths.context import in_dir
+
 # internal
 from tests.resources import clean_scenario
 
@@ -15,5 +23,10 @@ def test_native_command_basic():
 
     path = str(clean_scenario("native"))
 
-    assert yambs_main([PKG_NAME, "-C", path, "native", "-w", "-i"]) == 0
-    assert yambs_main([PKG_NAME, "-C", path, "native"]) == 0
+    with in_dir(path):
+        assert yambs_main([PKG_NAME, "native", "-w", "-i"]) == 0
+        assert yambs_main([PKG_NAME, "native"]) == 0
+
+        # Try to build (if we can).
+        if platform == "linux" and which("ninja"):
+            run("ninja", check=True)

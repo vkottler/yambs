@@ -135,7 +135,7 @@ def yambs_handler(task: DependencyTask) -> DependencyState:
         )
 
     # Ensure the final static library is linked within the static directory.
-    static_include = task.static.joinpath(static_lib.name)
+    static_include = task.static.joinpath(f"lib{static_lib.name}")
     if not static_include.is_symlink():
         static_include.symlink_to(
             Path("..", static_lib.relative_to(task.root))

@@ -9,6 +9,7 @@ from typing import List
 # third-party
 from vcorelib.io import ARBITER
 from vcorelib.logging import LoggerType
+from vcorelib.paths import set_exec_flags
 
 # internal
 from yambs.dependency.config import Dependency, DependencyData
@@ -51,11 +52,24 @@ class DependencyManager:
         logger.info("Third-party link flags: %s.", self.link_flags)
 
     def save(self, logger: LoggerType = None) -> None:
-        """Save state data."""
+        """Save state data and create the third-party build script."""
 
         ARBITER.encode(self.state_path, self.state)
         if logger is not None:
             self.info(logger)
+
+        script = self.root.joinpath("third_party.sh")
+        with script.open("w") as script_fd:
+            script_fd.write("#!/bin/bash\n\n")
+
+            # Add build commands.
+            for command in self.build_commands:
+                script_fd.write(" ".join(command))
+                script_fd.write("\n")
+
+            script_fd.write("\ndate > $1\n")
+
+        set_exec_flags(script)
 
     def audit(self, dep: Dependency) -> DependencyState:
         """Interact with a dependency if needed."""
