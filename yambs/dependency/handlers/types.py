@@ -4,7 +4,7 @@ A module declaring shared types.
 
 # built-in
 from pathlib import Path
-from typing import Callable, List, NamedTuple
+from typing import Callable, List, NamedTuple, Set
 
 # internal
 from yambs.dependency.config import Dependency, DependencyData
@@ -27,6 +27,8 @@ class DependencyTask(NamedTuple):
     dep: Dependency
     current: DependencyState
     data: DependencyData
+
+    nested: Set[Dependency]
 
 
 DependencyHandler = Callable[[DependencyTask], DependencyState]

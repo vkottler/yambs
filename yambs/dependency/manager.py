@@ -4,7 +4,7 @@ A module implementing a dependency manager.
 
 # built-in
 from pathlib import Path
-from typing import List
+from typing import List, Set
 
 # third-party
 from vcorelib.io import ARBITER
@@ -71,29 +71,47 @@ class DependencyManager:
 
         set_exec_flags(script)
 
-    def audit(self, dep: Dependency) -> DependencyState:
-        """Interact with a dependency if needed."""
+    def _create_task(self, dep: Dependency) -> DependencyTask:
+        """Create a new task object."""
 
         dep_data: DependencyData = self.state.setdefault(
             str(dep),
             {},
         )  # type: ignore
 
-        state = HANDLERS[dep.kind](
-            DependencyTask(
-                self.root,
-                self.include,
-                self.static,
-                self.build_commands,
-                self.compile_flags,
-                self.link_flags,
-                dep,
-                DependencyState(dep_data.setdefault("state", "init")),
-                dep_data.setdefault("handler", {}),
-            )
+        return DependencyTask(
+            self.root,
+            self.include,
+            self.static,
+            self.build_commands,
+            self.compile_flags,
+            self.link_flags,
+            dep,
+            DependencyState(dep_data.setdefault("state", "init")),
+            dep_data.setdefault("handler", {}),
+            set(),
         )
 
-        # Update state.
-        dep_data["state"] = str(state.value)
+    def audit(self, dep: Dependency) -> DependencyState:
+        """Interact with a dependency if needed."""
+
+        tasks = [self._create_task(dep)]
+        resolved: Set[Dependency] = set()
+
+        while tasks:
+            task = tasks.pop()
+            state = HANDLERS[dep.kind](task)
+            resolved.add(task.dep)
+
+            # Update state.
+            task.data["state"] = str(state.value)
+
+            # Handle any nested dependencies.
+            #
+            # Enable this soon!
+            #
+            # for nested in task.nested:
+            #     if nested not in resolved:
+            #         tasks.append(self._create_task(nested))
 
         return state

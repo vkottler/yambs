@@ -149,4 +149,8 @@ def yambs_handler(task: DependencyTask) -> DependencyState:
     if not src_include.is_symlink():
         src_include.symlink_to(Path("..", task.data["name"], "src"))
 
+    # Read the project's configuration data to find any nested dependencies.
+    # task.root.joinpath("yambs.yaml"), look for data file?
+    # task.nested.add()
+
     return task.current
