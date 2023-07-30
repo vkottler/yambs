@@ -18,6 +18,30 @@ from yambs.dependency.handlers.types import DependencyTask
 from yambs.dependency.state import DependencyState
 
 
+def write_third_party_script(
+    path: Path, commands: List[List[str]] = None
+) -> None:
+    """
+    Create a simple shell script normally containing instructions to build
+    third-party commands.
+    """
+
+    if commands is None:
+        commands = []
+
+    with path.open("w") as script_fd:
+        script_fd.write("#!/bin/bash\n\n")
+
+        # Add build commands.
+        for command in commands:
+            script_fd.write(" ".join(command))
+            script_fd.write("\n")
+
+        script_fd.write("\ndate > $1\n")
+
+    set_exec_flags(path)
+
+
 class DependencyManager:
     """A class for managing project dependencies."""
 
@@ -61,17 +85,7 @@ class DependencyManager:
         if logger is not None:
             self.info(logger)
 
-        with script.open("w") as script_fd:
-            script_fd.write("#!/bin/bash\n\n")
-
-            # Add build commands.
-            for command in self.build_commands:
-                script_fd.write(" ".join(command))
-                script_fd.write("\n")
-
-            script_fd.write("\ndate > $1\n")
-
-        set_exec_flags(script)
+        write_third_party_script(script, commands=self.build_commands)
 
     def _create_task(self, dep: Dependency) -> DependencyTask:
         """Create a new task object."""

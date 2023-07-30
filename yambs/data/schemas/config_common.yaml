@@ -1,5 +1,9 @@
 ---
 properties:
+  root:
+    type: string
+    default: "."
+
   src_root:
     type: string
     default: src

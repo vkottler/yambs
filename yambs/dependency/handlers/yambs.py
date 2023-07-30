@@ -9,7 +9,7 @@ from typing import Set
 # third-party
 import requests
 from vcorelib.io.archive import extractall
-from vcorelib.paths import validate_hex_digest
+from vcorelib.paths import Pathlike, normalize, validate_hex_digest
 
 # internal
 from yambs.config.common import DEFAULT_CONFIG
@@ -128,16 +128,35 @@ def check_nested_dependencies(
         nested.add(Dependency.create(dep))
 
 
-def audit_config_load(root: Path, data: DependencyData) -> DependencyData:
+def audit_config_load(
+    root: Path,
+    include: Path,
+    static: Path,
+    data: DependencyData,
+    config_path: Pathlike = DEFAULT_CONFIG,
+) -> DependencyData:
     """
     Load a dependency's configuration data (from disk if necessary) and
     return the result.
     """
 
     if "dependencies" not in data:
-        path = root.joinpath(DEFAULT_CONFIG)
+        config_path = normalize(config_path)
+        path = config_path
+        if not path.is_absolute():
+            path = root.joinpath(path)
+
         assert path.is_file(), path
-        config = load_native(path=path)
+
+        config = load_native(path=path, root=root)
+
+        # Ensure some directory linkages are set up ('static' and 'include').
+        config.third_party_root.mkdir(parents=True, exist_ok=True)
+
+        for source in [include, static]:
+            dest = config.third_party_root.joinpath(source.name)
+            if not dest.is_symlink():
+                dest.symlink_to(source)
 
         # It's not necessary to keep track of the entire configuration.
         data["dependencies"] = [x.asdict() for x in config.dependencies]
@@ -184,7 +203,8 @@ def yambs_handler(task: DependencyTask) -> DependencyState:
     # Check if loading the project configuration data is necessary.
     # Read the project's configuration data to find any nested dependencies.
     check_nested_dependencies(
-        audit_config_load(directory, task.data), task.nested
+        audit_config_load(directory, task.include, task.static, task.data),
+        task.nested,
     )
 
     return task.current
