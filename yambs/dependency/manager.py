@@ -35,9 +35,9 @@ def write_third_party_script(
         # Add build commands.
         for command in commands:
             script_fd.write(" ".join(command))
-            script_fd.write("\n")
+            script_fd.write(" &\n")
 
-        script_fd.write('\ndate > "$1"\n')
+        script_fd.write('wait\n\ndate > "$1"\n')
 
     set_exec_flags(path)
 
