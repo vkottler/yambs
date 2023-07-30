@@ -4,13 +4,16 @@ A module implementing a dependency handler for other yambs projects.
 
 # built-in
 from pathlib import Path
+from typing import Set
 
 # third-party
 import requests
 from vcorelib.io.archive import extractall
-from vcorelib.paths import validate_hex_digest
+from vcorelib.paths import Pathlike, normalize, validate_hex_digest
 
 # internal
+from yambs.config.common import DEFAULT_CONFIG
+from yambs.config.native import load_native
 from yambs.dependency.config import (
     Dependency,
     DependencyData,
@@ -113,6 +116,54 @@ def audit_extract(root: Path, data: DependencyData) -> Path:
     return name_link
 
 
+def check_nested_dependencies(
+    config: DependencyData, nested: Set[Dependency]
+) -> None:
+    """
+    Determine if a dependency's configuration specifies additional
+    dependencies. Add them to the provided set if so.
+    """
+
+    for dep in config.get("dependencies", []):
+        nested.add(Dependency.create(dep))
+
+
+def audit_config_load(
+    root: Path,
+    include: Path,
+    static: Path,
+    data: DependencyData,
+    config_path: Pathlike = DEFAULT_CONFIG,
+) -> DependencyData:
+    """
+    Load a dependency's configuration data (from disk if necessary) and
+    return the result.
+    """
+
+    if "dependencies" not in data:
+        config_path = normalize(config_path)
+        path = config_path
+        if not path.is_absolute():
+            path = root.joinpath(path)
+
+        assert path.is_file(), path
+
+        config = load_native(path=path, root=root)
+
+        # Ensure some directory linkages are set up ('static' and 'include').
+        config.third_party_root.mkdir(parents=True, exist_ok=True)
+
+        for source in [include, static]:
+            dest = config.third_party_root.joinpath(source.name)
+            if not dest.is_symlink():
+                dest.symlink_to(source)
+
+        # It's not necessary to keep track of the entire configuration.
+        data["dependencies"] = [x.asdict() for x in config.dependencies]
+
+    return data
+
+
 def yambs_handler(task: DependencyTask) -> DependencyState:
     """Handle a yambs dependency."""
 
@@ -149,8 +200,11 @@ def yambs_handler(task: DependencyTask) -> DependencyState:
     if not src_include.is_symlink():
         src_include.symlink_to(Path("..", task.data["name"], "src"))
 
+    # Check if loading the project configuration data is necessary.
     # Read the project's configuration data to find any nested dependencies.
-    # task.root.joinpath("yambs.yaml"), look for data file?
-    # task.nested.add()
+    check_nested_dependencies(
+        audit_config_load(directory, task.include, task.static, task.data),
+        task.nested,
+    )
 
     return task.current

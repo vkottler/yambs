@@ -78,12 +78,18 @@ class CommonConfig(_YambsDictCodec, _BasicDictCodec):
 
     file: Optional[Path]
 
-    def directory(self, name: str, mkdir: bool = True) -> Path:
+    dependencies: Set[Dependency]
+
+    def directory(
+        self, name: str, mkdir: bool = True, root: Path = None
+    ) -> Path:
         """Get a configurable directory."""
 
         name_root = Path(str(self.data[name]))
         if not name_root.is_absolute():
-            name_root = self.root.joinpath(name_root)
+            if root is None:
+                root = self.root
+            name_root = root.joinpath(name_root)
 
         if mkdir:
             name_root.mkdir(parents=True, exist_ok=True)
@@ -94,7 +100,7 @@ class CommonConfig(_YambsDictCodec, _BasicDictCodec):
         """Initialize this instance."""
 
         self.data = data
-        self.root = Path()
+        self.root = Path(data["root"])  # type: ignore
 
         self.src_root = self.directory("src_root")
         self.build_root = self.directory("build_root")
@@ -112,6 +118,11 @@ class CommonConfig(_YambsDictCodec, _BasicDictCodec):
             new_dep = Dependency(data=dep, verify=False)  # type: ignore
             new_dep.github.setdefault("owner", self.project.owner)
             self.dependencies.add(new_dep)
+
+    @property
+    def third_party_script(self) -> Path:
+        """Get the path to the third-party build script."""
+        return self.ninja_root.joinpath("third_party.sh")
 
     @classmethod
     def load(
@@ -139,13 +150,12 @@ class CommonConfig(_YambsDictCodec, _BasicDictCodec):
             expect_overwrite=True,
         )
 
+        if root is not None:
+            data["root"] = str(normalize(root))
+
         result = cls.create(data)
 
         if path.is_file():
             result.file = path
-
-        if root is not None:
-            result.root = normalize(root)
-            result.root.mkdir(parents=True, exist_ok=True)
 
         return result

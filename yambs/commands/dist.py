@@ -17,6 +17,7 @@ from vcorelib.paths import create_hex_digest
 # internal
 from yambs.commands.common import add_config_arg
 from yambs.config.common import CommonConfig
+from yambs.dependency.manager import write_third_party_script
 from yambs.dist import copy_source_tree, dist_metadata, make_archives
 
 
@@ -24,6 +25,10 @@ def dist_cmd(args: _Namespace) -> int:
     """Execute the dist command."""
 
     config = CommonConfig.load(path=args.config, root=args.dir)
+
+    # Ensure that the third-party build script doesn't contain any instructions
+    # to build third-party dependencies (that won't be present for linking).
+    write_third_party_script(config.third_party_script)
 
     # Prepare a temporary directory with project sources.
     with TemporaryDirectory() as tmp:
