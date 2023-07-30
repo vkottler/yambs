@@ -9,7 +9,7 @@ from typing import List, Set
 # third-party
 from vcorelib.io import ARBITER
 from vcorelib.logging import LoggerType
-from vcorelib.paths import set_exec_flags
+from vcorelib.paths import rel, set_exec_flags
 
 # internal
 from yambs.dependency.config import Dependency, DependencyData
@@ -30,14 +30,14 @@ def write_third_party_script(
         commands = []
 
     with path.open("w") as script_fd:
-        script_fd.write("#!/bin/bash\n\n")
+        script_fd.write("#!/bin/bash\n\nset -e\n\n")
 
         # Add build commands.
         for command in commands:
             script_fd.write(" ".join(command))
             script_fd.write("\n")
 
-        script_fd.write("\ndate > $1\n")
+        script_fd.write('\ndate > "$1"\n')
 
     set_exec_flags(path)
 
@@ -63,9 +63,15 @@ class DependencyManager:
         # A list of commands to run that should build dependencies.
         self.build_commands: List[List[str]] = []
 
+        # Ensure absolute paths aren't generated into ninja configurations.
+        base = self.root.parent
+
         # Aggregate compiler flags.
-        self.compile_flags = ["-iquote", str(self.include)]
-        self.link_flags = [f"-L{self.static}"]
+        self.compile_flags = [
+            "-iquote",
+            str(rel(self.include, base=base)),
+        ]
+        self.link_flags = [f"-L{rel(self.static, base=base)}"]
 
         # Keep track of dependencies that have been handled.
         self.resolved: Set[Dependency] = set()
