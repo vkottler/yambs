@@ -38,6 +38,11 @@ jobs:
 
       - run: pip${{matrix.python-version}} install vmklib>=1.8.0
 
+      # Begin project-specific setup.
+      - uses: seanmiddleditch/gha-setup-ninja@master
+        with: {version: 1.11.1}
+      # End project-specific setup.
+
       - run: mk python-sa-types
 
       - name: lint and build
