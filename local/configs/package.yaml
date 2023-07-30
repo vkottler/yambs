@@ -5,6 +5,11 @@ description: Yet another meta build-system.
 entry: {{entry}}
 time_command: true
 
+ci_local:
+  - "- uses: seanmiddleditch/gha-setup-ninja@master"
+  - "  with: {version: 1.11.1}"
+  - "  if: matrix.system == 'ubuntu-latest'"
+
 requirements:
   - datazen
   - vcorelib>=2.4.2
