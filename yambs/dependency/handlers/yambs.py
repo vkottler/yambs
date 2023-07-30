@@ -9,7 +9,7 @@ from typing import Set
 # third-party
 import requests
 from vcorelib.io.archive import extractall
-from vcorelib.paths import Pathlike, normalize, validate_hex_digest
+from vcorelib.paths import Pathlike, normalize, rel, validate_hex_digest
 
 # internal
 from yambs.config.common import DEFAULT_CONFIG
@@ -182,7 +182,7 @@ def yambs_handler(task: DependencyTask) -> DependencyState:
     if not static_lib.is_file():
         # Add a build command if the library still needs to be built.
         task.build_commands.append(
-            ["ninja", "-C", str(directory), f"{task.dep.target}_lib"]
+            ["ninja", "-C", str(rel(directory)), f"{task.dep.target}_lib"]
         )
 
     # Ensure the final static library is linked within the static directory.
