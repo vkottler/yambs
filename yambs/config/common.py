@@ -78,6 +78,8 @@ class CommonConfig(_YambsDictCodec, _BasicDictCodec):
 
     file: Optional[Path]
 
+    dependencies: Set[Dependency]
+
     def directory(self, name: str, mkdir: bool = True) -> Path:
         """Get a configurable directory."""
 

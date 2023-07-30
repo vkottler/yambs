@@ -43,6 +43,9 @@ class DependencyManager:
         self.compile_flags = ["-iquote", str(self.include)]
         self.link_flags = [f"-L{self.static}"]
 
+        # Keep track of dependencies that have been handled.
+        self.resolved: Set[Dependency] = set()
+
     def info(self, logger: LoggerType) -> None:
         """Log some information."""
 
@@ -51,14 +54,13 @@ class DependencyManager:
         logger.info("Third-party compile flags: %s.", self.compile_flags)
         logger.info("Third-party link flags: %s.", self.link_flags)
 
-    def save(self, logger: LoggerType = None) -> None:
+    def save(self, script: Path, logger: LoggerType = None) -> None:
         """Save state data and create the third-party build script."""
 
         ARBITER.encode(self.state_path, self.state)
         if logger is not None:
             self.info(logger)
 
-        script = self.root.joinpath("third_party.sh")
         with script.open("w") as script_fd:
             script_fd.write("#!/bin/bash\n\n")
 
@@ -96,22 +98,18 @@ class DependencyManager:
         """Interact with a dependency if needed."""
 
         tasks = [self._create_task(dep)]
-        resolved: Set[Dependency] = set()
 
         while tasks:
             task = tasks.pop()
             state = HANDLERS[dep.kind](task)
-            resolved.add(task.dep)
+            self.resolved.add(task.dep)
 
             # Update state.
             task.data["state"] = str(state.value)
 
             # Handle any nested dependencies.
-            #
-            # Enable this soon!
-            #
-            # for nested in task.nested:
-            #     if nested not in resolved:
-            #         tasks.append(self._create_task(nested))
+            for nested in task.nested:
+                if nested not in self.resolved:
+                    tasks.append(self._create_task(nested))
 
         return state

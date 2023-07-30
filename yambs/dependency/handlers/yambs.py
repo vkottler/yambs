@@ -4,6 +4,7 @@ A module implementing a dependency handler for other yambs projects.
 
 # built-in
 from pathlib import Path
+from typing import Set
 
 # third-party
 import requests
@@ -11,6 +12,8 @@ from vcorelib.io.archive import extractall
 from vcorelib.paths import validate_hex_digest
 
 # internal
+from yambs.config.common import DEFAULT_CONFIG
+from yambs.config.native import load_native
 from yambs.dependency.config import (
     Dependency,
     DependencyData,
@@ -113,6 +116,35 @@ def audit_extract(root: Path, data: DependencyData) -> Path:
     return name_link
 
 
+def check_nested_dependencies(
+    config: DependencyData, nested: Set[Dependency]
+) -> None:
+    """
+    Determine if a dependency's configuration specifies additional
+    dependencies. Add them to the provided set if so.
+    """
+
+    for dep in config.get("dependencies", []):
+        nested.add(Dependency.create(dep))
+
+
+def audit_config_load(root: Path, data: DependencyData) -> DependencyData:
+    """
+    Load a dependency's configuration data (from disk if necessary) and
+    return the result.
+    """
+
+    if "dependencies" not in data:
+        path = root.joinpath(DEFAULT_CONFIG)
+        assert path.is_file(), path
+        config = load_native(path=path)
+
+        # It's not necessary to keep track of the entire configuration.
+        data["dependencies"] = [x.asdict() for x in config.dependencies]
+
+    return data
+
+
 def yambs_handler(task: DependencyTask) -> DependencyState:
     """Handle a yambs dependency."""
 
@@ -149,8 +181,10 @@ def yambs_handler(task: DependencyTask) -> DependencyState:
     if not src_include.is_symlink():
         src_include.symlink_to(Path("..", task.data["name"], "src"))
 
+    # Check if loading the project configuration data is necessary.
     # Read the project's configuration data to find any nested dependencies.
-    # task.root.joinpath("yambs.yaml"), look for data file?
-    # task.nested.add()
+    check_nested_dependencies(
+        audit_config_load(directory, task.data), task.nested
+    )
 
     return task.current
