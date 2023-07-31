@@ -42,6 +42,8 @@ jobs:
       - uses: seanmiddleditch/gha-setup-ninja@master
         with: {version: 1.11.1}
         if: matrix.system == 'ubuntu-latest'
+      - run: mk python-editable
+        if: matrix.system == 'ubuntu-latest'
       # End project-specific setup.
 
       - run: mk python-sa-types

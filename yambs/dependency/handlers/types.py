@@ -16,6 +16,7 @@ class DependencyTask(NamedTuple):
 
     # Useful paths.
     root: Path
+    project_root: Path
     include: Path
     static: Path
 

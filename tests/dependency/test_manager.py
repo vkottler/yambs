@@ -14,4 +14,5 @@ def test_dependency_manager_basic():
     """Test basic interactions with a dependency manager."""
 
     with TemporaryDirectory() as tmp:
-        assert DependencyManager(Path(tmp))
+        tmp_path = Path(tmp)
+        assert DependencyManager(tmp_path, tmp_path)
