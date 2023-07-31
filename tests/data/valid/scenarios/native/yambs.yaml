@@ -20,3 +20,4 @@ variants:
 
 dependencies:
   - github: {repo: yambs-sample, owner: *self}
+  - directory: ../native2

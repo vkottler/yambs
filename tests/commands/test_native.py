@@ -23,6 +23,9 @@ def test_native_command_basic():
 
     path = str(clean_scenario("native"))
 
+    # Ensure the directory dependency is cleaned as well.
+    clean_scenario("native2")
+
     with in_dir(path):
         assert yambs_main([PKG_NAME, "native", "-w", "-i"]) == 0
         assert yambs_main([PKG_NAME, "native"]) == 0

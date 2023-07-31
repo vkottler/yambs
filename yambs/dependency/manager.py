@@ -45,10 +45,11 @@ def write_third_party_script(
 class DependencyManager:
     """A class for managing project dependencies."""
 
-    def __init__(self, root: Path) -> None:
+    def __init__(self, root: Path, project_root: Path) -> None:
         """Initialize this instance."""
 
         self.root = root
+        self.project_root = project_root
         self.state_path = self.root.joinpath("state.json")
         self.state = ARBITER.decode(self.state_path).data
 
@@ -103,6 +104,7 @@ class DependencyManager:
 
         return DependencyTask(
             self.root,
+            self.project_root,
             self.include,
             self.static,
             self.build_commands,

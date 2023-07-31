@@ -38,7 +38,7 @@ class NativeBuildEnvironment(LoggerMixin):
         self.config = config
 
         self.dependency_manager = DependencyManager(
-            self.config.third_party_root
+            self.config.third_party_root, self.config.root
         )
 
         # Collect sources.
