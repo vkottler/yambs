@@ -8,7 +8,7 @@ cflag_groups:
 
   # Instrument builds for coverage and other analysis.
   debug: [-Og, -g, --coverage]
-  opt: [-O2]
+  opt: [-O2, -s]
   asan: [-fsanitize=address]
   msan: [-fsanitize=memory]
 
