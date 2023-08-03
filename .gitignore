@@ -13,8 +13,10 @@ htmlcov
 *-stubs
 coverage*.xml
 tags
-third-party
+docs
+mklocal
 
+third-party
 ninja
 build.ninja
 .ninja*
