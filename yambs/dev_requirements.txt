@@ -5,6 +5,8 @@ ruff
 mypy
 isort
 yamllint
+yambs
+vmklib
 setuptools-wrapper
 types-setuptools
 types-requests
