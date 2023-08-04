@@ -2,7 +2,7 @@
     =====================================
     generator=datazen
     version=3.1.2
-    hash=3fc032cf4d97e362f8c12b3c9d721ddc
+    hash=95154b93e3567b9dbae82f0914864c00
     =====================================
 -->
 
@@ -16,8 +16,14 @@
 
 *Yet another meta build-system.*
 
-See also: [generated documentation](https://vkottler.github.io/python/pydoc/yambs.html)
-(created with [`pydoc`](https://docs.python.org/3/library/pydoc.html)).
+## Documentation
+
+### Generated
+
+* By [sphinx-apidoc](https://vkottler.github.io/python/sphinx/yambs)
+(What's [`sphinx-apidoc`](https://www.sphinx-doc.org/en/master/man/sphinx-apidoc.html)?)
+* By [pydoc](https://vkottler.github.io/python/pydoc/yambs.html)
+(What's [`pydoc`](https://docs.python.org/3/library/pydoc.html)?)
 
 ## Python Version Support
 
