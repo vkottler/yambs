@@ -8,9 +8,12 @@ cflag_groups:
 
   # Instrument builds for coverage and other analysis.
   debug: [-Og, -g, --coverage]
-  opt: [-O2, -s]
+  opt: [-O2]
   asan: [-fsanitize=address]
   msan: [-fsanitize=memory]
+
+ldflag_groups:
+  opt: [-s]
 
 variants:
 
@@ -27,6 +30,7 @@ variants:
 
   clang-opt:
     cflag_groups: [opt]
+    ldflag_groups: [opt]
     cc: clang
     cxx: clang++
     ld: clang++

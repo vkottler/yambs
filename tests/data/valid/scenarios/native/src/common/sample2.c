@@ -5,4 +5,5 @@ void sample2_method(void) {
   for (int i = 0; i < 2000; i++) {
     a *= 4;
   }
+  (void)a;
 }

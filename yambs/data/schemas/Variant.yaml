@@ -13,6 +13,12 @@ properties:
     items:
       type: string
 
+  ldflag_groups:
+    type: array
+    default: []
+    items:
+      type: string
+
   targets:
     type: array
     default: [apps, lib]

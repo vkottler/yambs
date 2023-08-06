@@ -16,7 +16,7 @@ properties:
     items:
       type: string
 
-  cflag_groups:
+  cflag_groups: &flag_groups
     type: object
     additionalProperties: false
     patternProperties:
@@ -24,6 +24,8 @@ properties:
         type: array
         items:
           type: string
+
+  ldflag_groups: *flag_groups
 
   variants:
     type: object

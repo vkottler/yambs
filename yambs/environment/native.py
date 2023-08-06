@@ -202,7 +202,10 @@ class NativeBuildEnvironment(LoggerMixin):
 
             # Render templates.
             generate_variants(
-                self.jinja, self.config, self.config.data["cflag_groups"]
+                self.jinja,
+                self.config,
+                self.config.data["cflag_groups"],
+                self.config.data["ldflag_groups"],
             )
             self.render(self.config.root, "build.ninja")
             for template in ["all", "rules"]:

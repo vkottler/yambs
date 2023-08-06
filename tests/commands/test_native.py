@@ -33,4 +33,4 @@ def test_native_command_basic():
         # Try to build (if we can).
         # Re-enable this when we fix the third party script.
         if platform == "linux" and which("ninja"):
-            run("ninja", check=True)
+            run(["ninja", "all"], check=True)
