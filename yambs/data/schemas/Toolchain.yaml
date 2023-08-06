@@ -15,10 +15,6 @@ properties:
     type: string
     default: ""
 
-  suffix:
-    type: string
-    default: ""
-
   root:
     type: string
     default: "./toolchains/$toolchain/out/bin"

@@ -14,6 +14,7 @@ int main(void) {
     a *= 2.0f;
     a /= 2.0f;
   }
+  (void)a;
 
   return 0;
 }

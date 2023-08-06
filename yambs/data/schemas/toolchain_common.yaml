@@ -13,3 +13,9 @@ properties:
     default: []
     items:
       type: string
+
+  extra_ldflags:
+    type: array
+    default: []
+    items:
+      type: string

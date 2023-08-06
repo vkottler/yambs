@@ -11,9 +11,10 @@ rule cxx
   command = $cxx -MD -MF $out.d $cflags -std=$cxx_standard -c $in -o $out
 {% if common_ldflags %}
 
-ldflags ={% for flag in common_ldflags %} {{flag}}{% endfor %}
+common_ldflags ={% for flag in common_ldflags %} {{flag}}{% endfor %}
 
 {% endif %}
+ldflags = $common_ldflags $variant_ldflags
 
 rule link
   command = $ld $cflags -Wl,-Map=$out.map $in $ldflags -o $out
