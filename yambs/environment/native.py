@@ -221,7 +221,11 @@ class NativeBuildEnvironment(LoggerMixin):
                 elfs = self.write_app_rules(path_fd, outputs)
 
         # Render format file.
-        render_format(self.config, sources_headers(self.sources))
+        render_format(
+            self.config,
+            sources_headers(self.sources),
+            suffix=self.config.data["variants"]["clang"]["suffix"],
+        )
 
         # Render application manifest.
         self._render_app_manifest(elfs)
