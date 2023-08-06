@@ -50,16 +50,17 @@ def audit_downloads(
 
         dest = root.joinpath(name)
 
-        if dest.is_file():
-            continue
-
         for suffix in to_download:
             if name.endswith(suffix):
-                # Download the file.
-                req = requests.get(asset["browser_download_url"], timeout=10)
-                with dest.open("wb") as dest_fd:
-                    for chunk in req.iter_content(chunk_size=4096):
-                        dest_fd.write(chunk)
+                # Download if necessary.
+                if not dest.is_file():
+                    # Download the file.
+                    req = requests.get(
+                        asset["browser_download_url"], timeout=10
+                    )
+                    with dest.open("wb") as dest_fd:
+                        for chunk in req.iter_content(chunk_size=4096):
+                            dest_fd.write(chunk)
 
                 data["assets"][suffix] = str(dest)
                 break
@@ -73,6 +74,7 @@ def audit_extract(root: Path, data: DependencyData) -> Path:
     if "directory" not in data:
         # The expected directory is just the name of the tarball with no
         # suffix.
+        assert TARBALL in data["assets"], data["assets"]
         expected = Path(data["assets"][TARBALL].replace(TARBALL, ""))
 
         # The name of the project is the directory name without the version

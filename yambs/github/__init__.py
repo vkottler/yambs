@@ -14,6 +14,12 @@ from vcorelib.dict.codec import BasicDictCodec as _BasicDictCodec
 # internal
 from yambs.schemas import YambsDictCodec as _YambsDictCodec
 
+GIHTUB_HEADERS = {
+    "Accept": "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+}
+ReleaseData = Dict[str, Any]
+
 
 class Github(_YambsDictCodec, _BasicDictCodec):
     """GitHub repository information."""
@@ -50,12 +56,6 @@ def latest_repo_release_api_url(owner: str, repo: str) -> str:
     ).geturl()
 
 
-GIHTUB_HEADERS = {
-    "Accept": "application/vnd.github+json",
-    "X-GitHub-Api-Version": "2022-11-28",
-}
-
-
 def check_api_token() -> None:
     """Check for a GitHub API token set via the environment."""
 
@@ -66,9 +66,6 @@ def check_api_token() -> None:
             ] = f"Bearer {os.environ['GITHUB_API_TOKEN']}"
 
 
-ReleaseData = Dict[str, Any]
-
-
 def latest_release_data(
     owner: str, repo: str, *args, timeout: float = None, **kwargs
 ) -> ReleaseData:
@@ -76,10 +73,27 @@ def latest_release_data(
 
     check_api_token()
 
-    return requests.get(  # type: ignore
-        latest_repo_release_api_url(owner, repo),
-        *args,
-        timeout=timeout,
-        headers=GIHTUB_HEADERS,
-        **kwargs,
-    ).json()
+    result: ReleaseData = {}
+
+    # codecov was bugging out.
+    tries = kwargs.get("tries", 5)
+
+    while not validate_release(result) and tries:
+        result = requests.get(
+            latest_repo_release_api_url(owner, repo),
+            *args,
+            timeout=timeout,
+            headers=GIHTUB_HEADERS,
+            **kwargs,
+        ).json()
+        tries -= 1
+
+    assert validate_release(result), result
+
+    return result
+
+
+def validate_release(data: ReleaseData) -> bool:
+    """Ensure that GitHub release data actually contains data."""
+
+    return all(x in data for x in ["name", "html_url", "assets"])

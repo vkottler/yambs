@@ -42,7 +42,7 @@ def write_format_target(
 
     # Just checks formatting.
     stream.write("rule clang-format-check" + linesep)
-    stream.write("  command = {cmd} -n --Werror $in" + linesep)
+    stream.write(f"  command = {cmd} -n --Werror $in" + linesep)
 
     paths = list(paths)
     if paths:
