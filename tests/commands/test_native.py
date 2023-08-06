@@ -31,6 +31,5 @@ def test_native_command_basic():
         assert yambs_main([PKG_NAME, "native"]) == 0
 
         # Try to build (if we can).
-        # Re-enable this when we fix the third party script.
         if platform == "linux" and which("ninja"):
             run(["ninja", "all", "format-check"], check=True)

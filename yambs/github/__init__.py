@@ -69,6 +69,12 @@ def check_api_token() -> None:
 ReleaseData = Dict[str, Any]
 
 
+def validate_release(data: ReleaseData) -> bool:
+    """Ensure that GitHub release data actually contains data."""
+
+    return all(x in data for x in ["name", "html_url", "assets"])
+
+
 def latest_release_data(
     owner: str, repo: str, *args, timeout: float = None, **kwargs
 ) -> ReleaseData:
@@ -76,10 +82,21 @@ def latest_release_data(
 
     check_api_token()
 
-    return requests.get(  # type: ignore
-        latest_repo_release_api_url(owner, repo),
-        *args,
-        timeout=timeout,
-        headers=GIHTUB_HEADERS,
-        **kwargs,
-    ).json()
+    result: ReleaseData = {}
+
+    # codecov was bugging out.
+    tries = kwargs.get("tries", 5)
+
+    while not validate_release(result) and tries:
+        result = requests.get(
+            latest_repo_release_api_url(owner, repo),
+            *args,
+            timeout=timeout,
+            headers=GIHTUB_HEADERS,
+            **kwargs,
+        ).json()
+        tries -= 1
+
+    assert validate_release(result), result
+
+    return result
