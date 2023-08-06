@@ -11,3 +11,7 @@ properties:
   ld:
     type: string
     default: g++
+
+  suffix:
+    type: string
+    default: ""

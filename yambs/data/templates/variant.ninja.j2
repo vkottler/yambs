@@ -3,9 +3,9 @@ variant = {{name}}
 c_standard = {{c_standard}}
 cxx_standard = {{cxx_standard}}
 
-cc = {{cc}}
-cxx = {{cxx}}
-ld = {{ld}}
+cc = {{cc}}{{suffix}}
+cxx = {{cxx}}{{suffix}}
+ld = {{ld}}{{suffix}}
 
 {% if extra_cflags %}
 variant_cflags ={% for flag in extra_cflags %} {{flag}}{% endfor %}
