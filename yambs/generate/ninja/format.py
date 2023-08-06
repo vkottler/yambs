@@ -15,34 +15,40 @@ from yambs.config.common import CommonConfig
 from yambs.generate.ninja import write_continuation
 
 
-def render_format(config: CommonConfig, paths: Iterable[Path]) -> None:
+def render_format(
+    config: CommonConfig, paths: Iterable[Path], suffix: str = ""
+) -> None:
     """Render the ninja source for formatting files."""
 
     with config.ninja_root.joinpath("format.ninja").open(
         "w", encoding=DEFAULT_ENCODING
     ) as path_fd:
-        write_format_target(path_fd, paths)
+        write_format_target(path_fd, paths, suffix)
 
 
-def write_format_target(stream: TextIO, paths: Iterable[Path]) -> None:
+def write_format_target(
+    stream: TextIO, paths: Iterable[Path], suffix: str
+) -> None:
     """
     Write rules and targets for running clang-format on first-party sources
     and headers.
     """
 
+    cmd = f"clang-format{suffix}"
+
     # Actually formats sources.
     stream.write("rule clang-format" + linesep)
-    stream.write("  command = clang-format -i $in" + linesep + linesep)
+    stream.write(f"  command = {cmd} -i $in" + linesep + linesep)
 
     # Just checks formatting.
     stream.write("rule clang-format-check" + linesep)
-    stream.write("  command = clang-format -n --Werror $in" + linesep)
+    stream.write("  command = {cmd} -n --Werror $in" + linesep)
 
     paths = list(paths)
     if paths:
-        for suffix in ["", "-check"]:
+        for sfx in ["", "-check"]:
             stream.write(linesep)
-            line = f"build format{suffix}: clang-format{suffix} "
+            line = f"build format{sfx}: clang-format{sfx} "
             offset = " " * len(line)
 
             stream.write(line)
