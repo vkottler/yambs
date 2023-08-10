@@ -6,6 +6,8 @@ Common command-line argument interfaces.
 from argparse import ArgumentParser as _ArgumentParser
 from argparse import Namespace as _Namespace
 from pathlib import Path as _Path
+from shutil import which
+from subprocess import run
 from sys import executable
 
 # third-party
@@ -54,6 +56,12 @@ def add_common_args(parser: _ArgumentParser) -> None:
         action="store_true",
         help="whether or not to only re-generate source manifests",
     )
+    parser.add_argument(
+        "-n",
+        "--no-build",
+        action="store_true",
+        help="whether or not to skip running 'ninja'",
+    )
 
 
 def run_watch(args: _Namespace, src_root: _Path, command: str) -> int:
@@ -82,3 +90,10 @@ def run_watch(args: _Namespace, src_root: _Path, command: str) -> int:
         if args.watch
         else 0
     )
+
+
+def handle_build(args: _Namespace) -> None:
+    """Run 'ninja' if some conditions are met."""
+
+    if not args.no_build and which("ninja"):
+        run(["ninja"], check=False)
