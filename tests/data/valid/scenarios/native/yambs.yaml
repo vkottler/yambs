@@ -11,6 +11,9 @@ project:
     owner: &self vkottler
 
 variants:
+  # Toggle this to test regeneration.
+  # new_variant: {}
+
   clang:
     cflag_groups: [debug]
 

@@ -1,7 +1,7 @@
 # =====================================
 # generator=datazen
 # version=3.1.3
-# hash=f12a77b15954045668945389858afc26
+# hash=e10efb5b655cacd368d023aacf84f288
 # =====================================
 
 """
@@ -16,6 +16,7 @@ from typing import Tuple as _Tuple
 from vcorelib.args import CommandRegister as _CommandRegister
 
 # internal
+from yambs.commands.compile_config import add_compile_config_cmd
 from yambs.commands.dist import add_dist_cmd
 from yambs.commands.gen import add_gen_cmd
 from yambs.commands.native import add_native_cmd
@@ -26,6 +27,11 @@ def commands() -> _List[_Tuple[str, str, _CommandRegister]]:
     """Get this package's commands."""
 
     return [
+        (
+            "compile_config",
+            "load configuration data and write results to a file",
+            add_compile_config_cmd,
+        ),
         (
             "dist",
             "create a source distribution",

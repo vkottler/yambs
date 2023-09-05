@@ -6,6 +6,9 @@ generated_dir = $src_dir/generated
 common_cflags = -I${src_dir}{% for flag in common_cflags %} {{flag}}{% endfor %}
 
 
+{% include "regenerate.ninja.j2" %}
+
+
 include $include_dir/all.ninja
 
 {% include "compile_commands.ninja.j2" %}

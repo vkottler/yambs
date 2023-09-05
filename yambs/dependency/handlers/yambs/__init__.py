@@ -77,7 +77,16 @@ def handle_static_lib(directory: Path, task: DependencyTask) -> None:
         # if the desired library isn't already built.
         if task.dep.source == DependencySource.DIRECTORY:
             cmd.extend(
-                [executable, "-m", PKG_NAME, "-C", rel_dir_arg, "native", "&&"]
+                [
+                    executable,
+                    "-m",
+                    PKG_NAME,
+                    "-C",
+                    rel_dir_arg,
+                    "native",
+                    "-n",
+                    "&&",
+                ]
             )
 
         # Add a build command if the library still needs to be built.
