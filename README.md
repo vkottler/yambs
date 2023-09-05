@@ -2,11 +2,11 @@
     =====================================
     generator=datazen
     version=3.1.3
-    hash=a00dd48dceea2789fda90dde3cb83fa9
+    hash=bc7cb8521b2bef4718193efe5c136f80
     =====================================
 -->
 
-# yambs ([2.4.2](https://pypi.org/project/yambs/))
+# yambs ([2.5.0](https://pypi.org/project/yambs/))
 
 [![python](https://img.shields.io/pypi/pyversions/yambs.svg)](https://pypi.org/project/yambs/)
 ![Build Status](https://github.com/vkottler/yambs/workflows/Python%20Package/badge.svg)
@@ -132,7 +132,8 @@ following a specific convention), put your configuration data here.
 ```
 $ ./venv3.11/bin/mbs -h
 
-usage: mbs [-h] [--version] [-v] [-C DIR] {dist,gen,native,uf2conv,noop} ...
+usage: mbs [-h] [--version] [-v] [-C DIR]
+           {compile_config,dist,gen,native,uf2conv,noop} ...
 
 Yet another meta build-system.
 
@@ -143,8 +144,9 @@ options:
   -C DIR, --dir DIR     execute from a specific directory
 
 commands:
-  {dist,gen,native,uf2conv,noop}
+  {compile_config,dist,gen,native,uf2conv,noop}
                         set of available commands
+    compile_config      load configuration data and write results to a file
     dist                create a source distribution
     gen                 poll the source tree and generate any new build files
     native              generate build files for native-only target projects
@@ -154,6 +156,31 @@ commands:
 ```
 
 ## Sub-command Options
+
+### `compile_config`
+
+```
+$ ./venv3.11/bin/mbs compile_config -h
+
+usage: mbs compile_config [-h] [-i INCLUDES_KEY] [-u] [-e]
+                          output inputs [inputs ...]
+
+positional arguments:
+  output                file to write
+  inputs                files to read
+
+options:
+  -h, --help            show this help message and exit
+  -i INCLUDES_KEY, --includes-key INCLUDES_KEY
+                        top-level key to use for included files (default:
+                        includes)
+  -u, --update          whether or not to use the 'update' merge strategy
+                        (instead of 'recursive')
+  -e, --expect-overwrite
+                        allow configuration files to overwrite data when
+                        loaded
+
+```
 
 ### `dist`
 
@@ -176,7 +203,7 @@ options:
 ```
 $ ./venv3.11/bin/mbs gen -h
 
-usage: mbs gen [-h] [-c CONFIG] [-i] [-w] [-s]
+usage: mbs gen [-h] [-c CONFIG] [-i] [-w] [-s] [-n]
 
 options:
   -h, --help            show this help message and exit
@@ -187,6 +214,7 @@ options:
   -w, --watch           whether or not to continue watching for source tree
                         changes
   -s, --sources         whether or not to only re-generate source manifests
+  -n, --no-build        whether or not to skip running 'ninja'
 
 ```
 
@@ -195,7 +223,7 @@ options:
 ```
 $ ./venv3.11/bin/mbs native -h
 
-usage: mbs native [-h] [-c CONFIG] [-i] [-w] [-s]
+usage: mbs native [-h] [-c CONFIG] [-i] [-w] [-s] [-n]
 
 options:
   -h, --help            show this help message and exit
@@ -206,6 +234,7 @@ options:
   -w, --watch           whether or not to continue watching for source tree
                         changes
   -s, --sources         whether or not to only re-generate source manifests
+  -n, --no-build        whether or not to skip running 'ninja'
 
 ```
 

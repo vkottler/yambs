@@ -4,6 +4,7 @@ A module for common configuration interfaces.
 
 # built-in
 from pathlib import Path
+from sys import executable
 from typing import Any, Dict, NamedTuple, Optional, Set, Type, TypeVar
 
 # third-party
@@ -100,6 +101,9 @@ class CommonConfig(_YambsDictCodec, _BasicDictCodec):
         """Initialize this instance."""
 
         self.data = data
+        self.data["entry"] = f"{executable} -m {PKG_NAME}"
+        self.data["config_file"] = str(DEFAULT_CONFIG)
+
         self.root = Path(data["root"])  # type: ignore
 
         self.src_root = self.directory("src_root")
@@ -157,5 +161,6 @@ class CommonConfig(_YambsDictCodec, _BasicDictCodec):
 
         if path.is_file():
             result.file = path
+            result.data["config_file"] = str(path)
 
         return result

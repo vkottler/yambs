@@ -30,6 +30,7 @@ renders:
       - renders-python_readme_header.md
       - renders-python_readme_dep_graph.md
       - commands-help
+      - commands-help-compile_config
       - commands-help-dist
       - commands-help-gen
       - commands-help-native
