@@ -23,7 +23,8 @@ variants:
   opt: {}
 
   clang:
-    cflag_groups: [debug, msan]
+    # msan - manually opt-in
+    cflag_groups: [debug]
     cc: clang
     cxx: clang++
     ld: clang++

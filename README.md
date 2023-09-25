@@ -2,11 +2,11 @@
     =====================================
     generator=datazen
     version=3.1.3
-    hash=024d5854c925e7e2bc56ca9b2646d66d
+    hash=13350eb3d59ce9eadac67f84c1509ec6
     =====================================
 -->
 
-# yambs ([2.5.1](https://pypi.org/project/yambs/))
+# yambs ([2.5.2](https://pypi.org/project/yambs/))
 
 [![python](https://img.shields.io/pypi/pyversions/yambs.svg)](https://pypi.org/project/yambs/)
 ![Build Status](https://github.com/vkottler/yambs/workflows/Python%20Package/badge.svg)
@@ -132,7 +132,7 @@ following a specific convention), put your configuration data here.
 ```
 $ ./venv3.11/bin/mbs -h
 
-usage: mbs [-h] [--version] [-v] [-C DIR]
+usage: mbs [-h] [--version] [-v] [-q] [--curses] [--no-uvloop] [-C DIR]
            {compile_config,dist,gen,native,uf2conv,noop} ...
 
 Yet another meta build-system.
@@ -141,6 +141,9 @@ options:
   -h, --help            show this help message and exit
   --version             show program's version number and exit
   -v, --verbose         set to increase logging verbosity
+  -q, --quiet           set to reduce output
+  --curses              whether or not to use curses.wrapper when starting
+  --no-uvloop           whether or not to disable uvloop as event loop driver
   -C DIR, --dir DIR     execute from a specific directory
 
 commands:
