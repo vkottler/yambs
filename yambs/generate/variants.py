@@ -63,12 +63,15 @@ def generate(
     """Generate variant-related ninja files."""
 
     for name, data in config.data["variants"].items():
-        variants_root = config.ninja_root.joinpath("variants", name)
-        variants_root.mkdir(parents=True, exist_ok=True)
-        with modified_variant_data(name, data, cflag_groups, ldflag_groups):
-            render_template(
-                jinja,
-                variants_root,
-                "variant.ninja",
-                data,
-            )
+        if data["enabled"]:
+            variants_root = config.ninja_root.joinpath("variants", name)
+            variants_root.mkdir(parents=True, exist_ok=True)
+            with modified_variant_data(
+                name, data, cflag_groups, ldflag_groups
+            ):
+                render_template(
+                    jinja,
+                    variants_root,
+                    "variant.ninja",
+                    data,
+                )
