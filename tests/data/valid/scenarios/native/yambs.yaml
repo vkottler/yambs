@@ -17,6 +17,9 @@ variants:
   # Toggle this to test regeneration.
   # new_variant: {}
 
+  rando_variant:
+    enabled: false
+
   clang:
     cflag_groups: [debug]
 

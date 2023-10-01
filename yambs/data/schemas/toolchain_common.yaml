@@ -19,3 +19,8 @@ properties:
     default: []
     items:
       type: string
+
+  # If set, overrides any other toolchain pathing or prefix construction.
+  prefix:
+    type: string
+    default: ""
