@@ -32,6 +32,7 @@ renders:
       - commands-help
       - commands-help-compile_config
       - commands-help-dist
+      - commands-help-download
       - commands-help-gen
       - commands-help-native
       - commands-help-uf2conv
