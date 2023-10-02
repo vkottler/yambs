@@ -13,10 +13,13 @@ from yambs.generate.common import APP_ROOT
 BySuffixPaths = Dict[str, Set[Path]]
 
 
-def collect_files(root: Path, recurse: bool = True) -> BySuffixPaths:
+def collect_files(
+    root: Path, recurse: bool = True, files: BySuffixPaths = None
+) -> BySuffixPaths:
     """Collect files (by suffix) from a starting directory."""
 
-    files: BySuffixPaths = defaultdict(set)
+    if files is None:
+        files = defaultdict(set)
 
     for item in root.iterdir():
         if item.is_dir() and recurse:
@@ -44,12 +47,21 @@ def sources_headers(paths: BySuffixPaths) -> Set[Path]:
 
 
 def populate_sources(
-    paths: BySuffixPaths, src_root: Path, apps: Set[Path], regular: Set[Path]
+    paths: BySuffixPaths,
+    src_root: Path,
+    apps: Set[Path],
+    regular: Set[Path],
+    third_party: Set[Path],
 ) -> None:
     """Populate application and regular sources from a group of paths."""
 
     for source in compile_sources(paths):
-        if str(source.relative_to(src_root)).startswith(APP_ROOT):
-            apps.add(source)
-        else:
-            regular.add(source)
+        try:
+            if str(source.relative_to(src_root)).startswith(APP_ROOT):
+                apps.add(source)
+            else:
+                regular.add(source)
+
+        # Handle a source file outside of the main source tree.
+        except ValueError:
+            third_party.add(source)

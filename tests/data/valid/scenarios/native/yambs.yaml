@@ -30,3 +30,6 @@ variants:
 dependencies:
   - github: {repo: yambs-sample, owner: *self}
   - directory: ../native2
+
+  - directory: ../native3
+    as_source: true

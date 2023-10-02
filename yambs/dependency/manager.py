@@ -64,6 +64,9 @@ class DependencyManager:
         # A list of commands to run that should build dependencies.
         self.build_commands: List[List[str]] = []
 
+        # Directories to be treated as additional source directories.
+        self.source_dirs: Set[Path] = set()
+
         # Ensure absolute paths aren't generated into ninja configurations.
         base = self.root.parent
 
@@ -108,6 +111,7 @@ class DependencyManager:
             self.include,
             self.static,
             self.build_commands,
+            self.source_dirs,
             self.compile_flags,
             self.link_flags,
             dep,

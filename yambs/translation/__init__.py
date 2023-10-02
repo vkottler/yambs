@@ -23,9 +23,13 @@ class SourceTranslator(NamedTuple):
     output_extension: str = ".o"
     dest: Path = Path(BUILD_DIR_VAR)
 
+    def translate(self, path: Path) -> Path:
+        """Translate a path by changing its suffix."""
+        return path.with_suffix(self.output_extension)
+
     def output(self, path: Path) -> Path:
         """Get the output file from a given path."""
-        return self.dest.joinpath(path.with_suffix(self.output_extension))
+        return self.dest.joinpath(self.translate(path))
 
     @property
     def gets_linked(self) -> bool:

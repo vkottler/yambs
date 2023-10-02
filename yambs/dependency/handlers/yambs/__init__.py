@@ -113,7 +113,8 @@ def yambs_handler(task: DependencyTask) -> DependencyState:
     directory = handle_source(task)
     config, directory = handle_config_load(task, directory)
 
-    handle_static_lib(directory, task)
+    if not task.dep.as_source:
+        handle_static_lib(directory, task)
 
     # Ensure the 'src' directory is linked within the include directory.
     src_include = task.include.joinpath(task.data["name"])
@@ -122,6 +123,9 @@ def yambs_handler(task: DependencyTask) -> DependencyState:
             src_include.symlink_to(Path("..", task.data["name"], "src"))
         else:
             src_include.symlink_to(directory.joinpath("src"))
+
+    if task.dep.as_source:
+        task.source_dirs.add(src_include)
 
     # Check if loading the project configuration data is necessary.
     # Read the project's configuration data to find any nested dependencies.
