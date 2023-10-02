@@ -2,11 +2,11 @@
     =====================================
     generator=datazen
     version=3.1.3
-    hash=5385bdb3ad34d67455cd0d0cd2349d4e
+    hash=7c5f56f5b4ab2cfc9391105a8b2dc902
     =====================================
 -->
 
-# yambs ([2.6.0](https://pypi.org/project/yambs/))
+# yambs ([2.7.0](https://pypi.org/project/yambs/))
 
 [![python](https://img.shields.io/pypi/pyversions/yambs.svg)](https://pypi.org/project/yambs/)
 ![Build Status](https://github.com/vkottler/yambs/workflows/Python%20Package/badge.svg)
@@ -133,7 +133,7 @@ following a specific convention), put your configuration data here.
 $ ./venv3.11/bin/mbs -h
 
 usage: mbs [-h] [--version] [-v] [-q] [--curses] [--no-uvloop] [-C DIR]
-           {compile_config,dist,gen,native,uf2conv,noop} ...
+           {compile_config,dist,download,gen,native,uf2conv,noop} ...
 
 Yet another meta build-system.
 
@@ -147,10 +147,11 @@ options:
   -C DIR, --dir DIR     execute from a specific directory
 
 commands:
-  {compile_config,dist,gen,native,uf2conv,noop}
+  {compile_config,dist,download,gen,native,uf2conv,noop}
                         set of available commands
     compile_config      load configuration data and write results to a file
     dist                create a source distribution
+    download            download GitHub release assets
     gen                 poll the source tree and generate any new build files
     native              generate build files for native-only target projects
     uf2conv             convert to UF2 or flash directly
@@ -198,6 +199,26 @@ options:
                         the path to the top-level configuration file (default:
                         'yambs.yaml')
   -s, --sources         set this flag to only capture source files
+
+```
+
+### `download`
+
+```
+$ ./venv3.11/bin/mbs download -h
+
+usage: mbs download [-h] [-o OWNER] [-r REPO] [-O OUTPUT] [-p PATTERN]
+
+options:
+  -h, --help            show this help message and exit
+  -o OWNER, --owner OWNER
+                        repository owner (default: 'vkottler')
+  -r REPO, --repo REPO  repository name (default: 'toolchains')
+  -O OUTPUT, --output OUTPUT
+                        output directory (default: 'toolchains')
+  -p PATTERN, --pattern PATTERN
+                        a pattern to use to select project specifications
+                        filtered by name
 
 ```
 

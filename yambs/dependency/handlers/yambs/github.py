@@ -4,9 +4,9 @@ A module with interfaces for working with yambs projects found on GitHub.
 
 # built-in
 from pathlib import Path
+from typing import Any, Optional
 
 # third-party
-import requests
 from vcorelib.io.archive import extractall
 from vcorelib.paths import validate_hex_digest
 
@@ -45,25 +45,23 @@ def audit_downloads(
     """Ensure release assets are downloaded."""
 
     to_download = ["sum", TARBALL]
-    for asset in github.data["assets"]:
-        name = asset["name"]
 
+    def filt(asset: dict[str, Any]) -> Optional[Path]:
+        """Determine if the release asset should be downloaded."""
+
+        result = None
+
+        name = asset["name"]
         dest = root.joinpath(name)
 
         for suffix in to_download:
             if name.endswith(suffix):
-                # Download if necessary.
-                if not dest.is_file():
-                    # Download the file.
-                    req = requests.get(
-                        asset["browser_download_url"], timeout=10
-                    )
-                    with dest.open("wb") as dest_fd:
-                        for chunk in req.iter_content(chunk_size=4096):
-                            dest_fd.write(chunk)
-
                 data["assets"][suffix] = str(dest)
-                break
+                result = dest
+
+        return result
+
+    github.download_release_assets(filt)
 
 
 def audit_extract(root: Path, data: DependencyData) -> Path:

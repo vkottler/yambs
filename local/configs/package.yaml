@@ -28,6 +28,8 @@ commands:
     description: load configuration data and write results to a file
   - name: dist
     description: create a source distribution
+  - name: download
+    description: download GitHub release assets
   - name: gen
     description: poll the source tree and generate any new build files
   - name: native
