@@ -101,10 +101,10 @@ class CommonConfig(_YambsDictCodec, _BasicDictCodec):
         """Initialize this instance."""
 
         self.data = data
-        self.data["entry"] = f"{executable} -m {PKG_NAME}"
-        self.data["config_file"] = str(DEFAULT_CONFIG)
-
         self.root = Path(data["root"])  # type: ignore
+
+        self.data["config_file"] = str(DEFAULT_CONFIG)
+        self.data["entry"] = f"{Path(executable).name} -m {PKG_NAME}"
 
         self.src_root = self.directory("src_root")
         self.build_root = self.directory("build_root")

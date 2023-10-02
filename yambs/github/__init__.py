@@ -49,10 +49,19 @@ def github_url(
     )
 
 
-def latest_repo_release_api_url(owner: str, repo: str) -> str:
+DEFAULT_RELEASE = "latest"
+
+
+def repo_release_api_url(
+    owner: str, repo: str, version: str = DEFAULT_RELEASE
+) -> str:
     """Get a URL string for a repository's latest release."""
+
+    version_str = version if version == DEFAULT_RELEASE else f"tags/{version}"
+
     return github_url(
-        netloc_prefix="api", path=f"repos/{owner}/{repo}/releases/latest"
+        netloc_prefix="api",
+        path=f"repos/{owner}/{repo}/releases/{version_str}",
     ).geturl()
 
 
@@ -66,8 +75,13 @@ def check_api_token() -> None:
             ] = f"Bearer {os.environ['GITHUB_API_TOKEN']}"
 
 
-def latest_release_data(
-    owner: str, repo: str, *args, timeout: float = None, **kwargs
+def release_data(
+    owner: str,
+    repo: str,
+    *args,
+    version: str = DEFAULT_RELEASE,
+    timeout: float = None,
+    **kwargs,
 ) -> ReleaseData:
     """Get latest-release data."""
 
@@ -80,7 +94,7 @@ def latest_release_data(
 
     while not validate_release(result) and tries:
         result = requests.get(
-            latest_repo_release_api_url(owner, repo),
+            repo_release_api_url(owner, repo, version=version),
             *args,
             timeout=timeout,
             headers=GIHTUB_HEADERS,

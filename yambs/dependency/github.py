@@ -15,7 +15,7 @@ from vcorelib.logging import LoggerMixin, LoggerType
 from vcorelib.math import nano_str
 
 # internal
-from yambs.github import ReleaseData, latest_release_data
+from yambs.github import DEFAULT_RELEASE, ReleaseData, release_data
 
 AssetFilter = Callable[[dict[str, Any]], Optional[Path]]
 
@@ -82,14 +82,20 @@ class GithubDependency(LoggerMixin):
     """A class for managing GitHub dependencies."""
 
     def __init__(
-        self, owner: str, repo: str, *args, data: ReleaseData = None, **kwargs
+        self,
+        owner: str,
+        repo: str,
+        *args,
+        version: str = DEFAULT_RELEASE,
+        data: ReleaseData = None,
+        **kwargs,
     ) -> None:
         """Initialize this instance."""
 
         super().__init__(logger_name=f"{owner}.{repo}")
 
         if data is None:
-            data = latest_release_data(owner, repo, *args, **kwargs)
+            data = release_data(owner, repo, *args, version=version, **kwargs)
         self.data = data
 
         self.logger.info(

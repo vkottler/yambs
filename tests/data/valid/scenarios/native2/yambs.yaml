@@ -3,5 +3,8 @@ project:
   name: yambs2
 
 dependencies:
-  - github: {repo: yambs-sample, owner: vkottler}
   - github: {repo: yambs-sample2, owner: vkottler}
+    # This is temporary.
+    version: 0.1.3
+
+  - github: {repo: yambs-sample, owner: vkottler}
