@@ -1,3 +1,4 @@
+/* internal */
 #include "sample.h"
 
 /* third-party */

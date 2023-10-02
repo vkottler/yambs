@@ -5,7 +5,7 @@ A module implementing a native-build environment.
 # built-in
 from os import linesep
 from pathlib import Path
-from typing import Any, Dict, Set, TextIO
+from typing import Any, Dict, Optional, Set, TextIO
 
 # third-party
 from vcorelib.io import ARBITER
@@ -15,7 +15,7 @@ from vcorelib.logging import LoggerMixin
 from yambs.aggregation import collect_files, populate_sources, sources_headers
 from yambs.config.native import Native
 from yambs.dependency.manager import DependencyManager
-from yambs.generate.common import get_jinja, render_template
+from yambs.generate.common import APP_ROOT, get_jinja, render_template
 from yambs.generate.ninja import write_continuation
 from yambs.generate.ninja.format import render_format
 from yambs.generate.variants import generate as generate_variants
@@ -70,33 +70,44 @@ class NativeBuildEnvironment(LoggerMixin):
 
         return out
 
-    def write_third_party_line(self, stream: TextIO, path: Path) -> Path:
+    def write_third_party_line(
+        self, stream: TextIO, path: Path
+    ) -> Optional[Path]:
         """Write a single source-compile line for a third-party source."""
 
-        translator = get_translator(path)
+        out = None
 
         # Get the relative part of the path from the third-party root.
         rel_part = path.relative_to(self.config.third_party_root)
 
-        out = translator.translate(Path("$build_dir", "third-party", rel_part))
+        # Ignore applications.
+        if APP_ROOT not in str(rel_part):
+            translator = get_translator(path)
+            out = translator.translate(
+                Path("$build_dir", "third-party", rel_part)
+            )
 
-        stream.write(
-            f"build {out}: {translator.rule} $third_party_dir/{rel_part}"
-        )
-        stream.write(linesep)
+            stream.write(
+                f"build {out}: {translator.rule} $third_party_dir/{rel_part}"
+            )
+            stream.write(linesep)
 
         return out
 
     def write_source_rules(self, stream: TextIO) -> Set[Path]:
         """Write source rules."""
 
-        # Add third-party sources.
-        return {
+        result = {
             self.write_compile_line(stream, path) for path in self.regular
-        } | {
-            self.write_third_party_line(stream, path)
-            for path in self.third_party
         }
+
+        # Add third-party sources.
+        for path in self.third_party:
+            path_result = self.write_third_party_line(stream, path)
+            if path_result is not None:
+                result.add(path_result)
+
+        return result
 
     def write_static_library_rule(
         self, stream: TextIO, outputs: Set[Path]
