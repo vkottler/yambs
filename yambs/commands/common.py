@@ -5,6 +5,7 @@ Common command-line argument interfaces.
 # built-in
 from argparse import ArgumentParser as _ArgumentParser
 from argparse import Namespace as _Namespace
+from logging import getLogger
 from pathlib import Path as _Path
 from shutil import which
 from subprocess import run
@@ -15,8 +16,15 @@ from rcmpy.watch import watch
 from rcmpy.watch.params import WatchParams
 
 # internal
-from yambs import PKG_NAME
+from yambs import DESCRIPTION, PKG_NAME, VERSION
 from yambs.config.common import DEFAULT_CONFIG
+
+LOG = getLogger(__name__)
+
+
+def log_package() -> None:
+    """Log some basic package information."""
+    LOG.info("%s-%s - %s.", PKG_NAME, VERSION, DESCRIPTION)
 
 
 def add_config_arg(parser: _ArgumentParser) -> None:
