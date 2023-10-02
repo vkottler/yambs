@@ -16,6 +16,10 @@ properties:
     type: string
     default: opt
 
+  version:
+    type: string
+    default: latest
+
   github:
     $ref: package://yambs/schemas/Github.yaml
 

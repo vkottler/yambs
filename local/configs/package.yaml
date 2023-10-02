@@ -10,6 +10,7 @@ ci_local:
   - "  with: {version: 1.11.1}"
   - "  if: matrix.system == 'ubuntu-latest'"
 
+  - "- run: pip${{'{{matrix.python-version}}'}} install -e ."
   - "- run: mk python-editable"
   - "  if: matrix.system == 'ubuntu-latest'"
 

@@ -42,6 +42,7 @@ jobs:
       - uses: seanmiddleditch/gha-setup-ninja@master
         with: {version: 1.11.1}
         if: matrix.system == 'ubuntu-latest'
+      - run: pip${{matrix.python-version}} install -e .
       - run: mk python-editable
         if: matrix.system == 'ubuntu-latest'
       # End project-specific setup.
@@ -75,7 +76,7 @@ jobs:
 
       - run: |
           mk python-release owner=vkottler \
-                            repo=yambs version=2.7.0
+                            repo=yambs version=2.7.1
         if: |
           matrix.python-version == '3.11'
           && matrix.system == 'ubuntu-latest'

@@ -12,6 +12,9 @@ from vcorelib.args import CommandFunction as _CommandFunction
 from vcorelib.dict import MergeStrategy, merge_dicts
 from vcorelib.io import ARBITER, DEFAULT_INCLUDES_KEY
 
+# internal
+from yambs.commands.common import log_package
+
 
 def compile_config_cmd(args: _Namespace) -> int:
     """Execute the compile_config command."""
@@ -19,6 +22,8 @@ def compile_config_cmd(args: _Namespace) -> int:
     merge_strat = MergeStrategy.RECURSIVE
     if args.update:
         merge_strat = MergeStrategy.UPDATE
+
+    log_package()
 
     return (
         0

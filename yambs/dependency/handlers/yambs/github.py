@@ -28,6 +28,7 @@ def github_release(dep: Dependency, data: DependencyData) -> GithubDependency:
     github = GithubDependency(
         dep.github["owner"],
         dep.github["repo"],
+        version=dep.version,
         data=data.get("latest_release"),
     )
 
