@@ -126,6 +126,9 @@ def yambs_handler(task: DependencyTask) -> DependencyState:
 
     if task.dep.as_source:
         task.source_dirs.add(src_include)
+        task.compile_flags.extend(
+            ["-iquote", str(rel(src_include, base=task.root.parent))]
+        )
 
     # Check if loading the project configuration data is necessary.
     # Read the project's configuration data to find any nested dependencies.
