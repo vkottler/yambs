@@ -45,9 +45,7 @@ class NativeBuildEnvironment(LoggerMixin):
         self.sources = collect_files(config.src_root)
         self.apps: Set[Path] = set()
         self.regular: Set[Path] = set()
-        populate_sources(
-            self.sources, config.src_root, self.apps, self.regular
-        )
+        self.third_party: Set[Path] = set()
 
         self.jinja = get_jinja()
 
@@ -72,9 +70,33 @@ class NativeBuildEnvironment(LoggerMixin):
 
         return out
 
+    def write_third_party_line(self, stream: TextIO, path: Path) -> Path:
+        """Write a single source-compile line for a third-party source."""
+
+        translator = get_translator(path)
+
+        # Get the relative part of the path from the third-party root.
+        rel_part = path.relative_to(self.config.third_party_root)
+
+        out = translator.translate(Path("$build_dir", "third-party", rel_part))
+
+        stream.write(
+            f"build {out}: {translator.rule} $third_party_dir/{rel_part}"
+        )
+        stream.write(linesep)
+
+        return out
+
     def write_source_rules(self, stream: TextIO) -> Set[Path]:
         """Write source rules."""
-        return {self.write_compile_line(stream, path) for path in self.regular}
+
+        # Add third-party sources.
+        return {
+            self.write_compile_line(stream, path) for path in self.regular
+        } | {
+            self.write_third_party_line(stream, path)
+            for path in self.third_party
+        }
 
     def write_static_library_rule(
         self, stream: TextIO, outputs: Set[Path]
@@ -200,6 +222,21 @@ class NativeBuildEnvironment(LoggerMixin):
                 self.dependency_manager.link_flags
             )
 
+            # Handle additional source directories (belonging to dependencies).
+            for path in self.dependency_manager.source_dirs:
+                collect_files(path, files=self.sources)
+            populate_sources(
+                self.sources,
+                self.config.src_root,
+                self.apps,
+                self.regular,
+                self.third_party,
+            )
+
+            # Handle third-party sources.
+            # probably do like:
+            # $build_dir/third-party $src_dir/../ ?
+
             # Render templates.
             generate_variants(
                 self.jinja,
@@ -226,7 +263,11 @@ class NativeBuildEnvironment(LoggerMixin):
         # Render format file.
         render_format(
             self.config,
-            sources_headers(self.sources),
+            {
+                x
+                for x in sources_headers(self.sources)
+                if self.config.src_root in x.parents
+            },
             suffix=self.config.data["variants"]["clang"]["suffix"],
         )
 

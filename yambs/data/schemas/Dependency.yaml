@@ -12,6 +12,10 @@ properties:
     enum: [github]
     default: github
 
+  as_source:
+    type: boolean
+    default: false
+
   target:
     type: string
     default: opt

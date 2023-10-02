@@ -68,3 +68,4 @@ class Dependency(_YambsDictCodec, _BasicDictCodec):
         )
         self.target: str = data["target"]  # type: ignore
         self.version: str = data["version"]  # type: ignore
+        self.as_source: bool = data["as_source"]  # type: ignore

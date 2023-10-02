@@ -28,9 +28,8 @@ variants:
     cflag_groups: [opt]
 
 dependencies:
-  # This is temporary.
-  # - github: {repo: yambs-sample, owner: *self}
-  - github: {repo: yambs-sample2, owner: *self}
-    version: 0.1.3
-
+  - github: {repo: yambs-sample, owner: *self}
   - directory: ../native2
+
+  - directory: ../native3
+    as_source: true

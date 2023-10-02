@@ -21,6 +21,7 @@ class DependencyTask(NamedTuple):
     static: Path
 
     build_commands: List[List[str]]
+    source_dirs: Set[Path]
 
     compile_flags: List[str]
     link_flags: List[str]
