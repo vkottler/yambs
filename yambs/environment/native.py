@@ -244,10 +244,6 @@ class NativeBuildEnvironment(LoggerMixin):
                 self.third_party,
             )
 
-            # Handle third-party sources.
-            # probably do like:
-            # $build_dir/third-party $src_dir/../ ?
-
             # Render templates.
             generate_variants(
                 self.jinja,
@@ -279,6 +275,7 @@ class NativeBuildEnvironment(LoggerMixin):
                 for x in sources_headers(self.sources)
                 if self.config.src_root in x.parents
             },
+            root=self.config.root,
             suffix=self.config.data["variants"]["clang"]["suffix"],
         )
 
