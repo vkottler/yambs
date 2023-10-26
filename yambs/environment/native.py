@@ -10,6 +10,7 @@ from typing import Any, Dict, Optional, Set, TextIO
 # third-party
 from vcorelib.io import ARBITER
 from vcorelib.logging import LoggerMixin
+from vcorelib.paths import Pathlike, normalize
 
 # internal
 from yambs.aggregation import collect_files, populate_sources, sources_headers
@@ -25,6 +26,13 @@ from yambs.translation import BUILD_DIR_PATH, get_translator
 def resolve_build_dir(build_root: Path, variant: str, path: Path) -> Path:
     """Resolve the build-directory variable in a path."""
     return build_root.joinpath(variant, path.relative_to(BUILD_DIR_PATH))
+
+
+def combine_if_not_absolute(root: Path, candidate: Pathlike) -> Path:
+    """https://github.com/vkottler/ifgen/blob/master/ifgen/paths.py"""
+
+    candidate = normalize(candidate)
+    return candidate if candidate.is_absolute() else root.joinpath(candidate)
 
 
 class NativeBuildEnvironment(LoggerMixin):
@@ -77,8 +85,11 @@ class NativeBuildEnvironment(LoggerMixin):
 
         out = None
 
-        # Get the relative part of the path from the third-party root.
-        rel_part = path.relative_to(self.config.third_party_root)
+        try:
+            # Get the relative part of the path from the third-party root.
+            rel_part = path.relative_to(self.config.third_party_root)
+        except ValueError:
+            rel_part = Path("..", path.relative_to(self.config.root))
 
         # Ignore applications.
         if APP_ROOT not in str(rel_part):
@@ -234,7 +245,10 @@ class NativeBuildEnvironment(LoggerMixin):
             )
 
             # Handle additional source directories (belonging to dependencies).
-            for path in self.dependency_manager.source_dirs:
+            for path in self.dependency_manager.source_dirs | {
+                combine_if_not_absolute(self.config.root, x)
+                for x in self.config.data.get("extra_sources", [])
+            }:
                 collect_files(path, files=self.sources)
             populate_sources(
                 self.sources,

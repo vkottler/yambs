@@ -35,6 +35,11 @@ properties:
     items:
       type: string
 
+  extra_sources:
+    type: array
+    items:
+      type: string
+
   project:
     $ref: package://yambs/schemas/Project.yaml
 
