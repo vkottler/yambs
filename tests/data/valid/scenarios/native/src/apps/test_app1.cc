@@ -34,6 +34,7 @@ int main(void) {
 
   Example4::method1();
   Example4::method2();
+  Example4::method3();
 
   return 0;
 }
