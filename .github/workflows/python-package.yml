@@ -52,6 +52,8 @@ jobs:
           sudo ./llvm.sh 17
           rm llvm.sh
         if: matrix.system == 'ubuntu-latest'
+      - run: sudo apt-get install gcc-13 g++-13 clang-17 clang-format-17
+        if: matrix.system == 'ubuntu-latest'
       # End project-specific setup.
 
       - run: mk python-sa-types
