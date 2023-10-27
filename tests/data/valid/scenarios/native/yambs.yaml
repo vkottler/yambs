@@ -22,6 +22,8 @@ variants:
 
   debug:
     suffix: &gcc_version "-13"
+    targets: [apps, lib, uf2s]
+
   opt:
     suffix: *gcc_version
 

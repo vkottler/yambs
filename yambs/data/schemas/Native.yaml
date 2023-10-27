@@ -36,3 +36,4 @@ properties:
 
   uf2_family:
     type: string
+    default: ""

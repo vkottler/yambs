@@ -27,9 +27,11 @@ rule hex
 
 rule dump
   command = ${toolchain_prefix}objdump -D $in > $out
+{% if uf2_family %}
 
 rule uf2
-  command = mbs uf2conv $uf2conv_args -o $out $in
+  command = mbs uf2conv -f {{uf2_family}} -o $out $in
+{% endif %}
 
 rule ar
   command = ar rcs $out $in
