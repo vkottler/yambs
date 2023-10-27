@@ -19,6 +19,20 @@ ldflags = $common_ldflags $variant_ldflags
 rule link
   command = $ld $cflags -Wl,-Map=$out.map $in $ldflags -o $out
 
+rule bin
+  command = ${toolchain_prefix}objcopy -O binary $in $out
+
+rule hex
+  command = ${toolchain_prefix}objcopy -O ihex $in $out
+
+rule dump
+  command = ${toolchain_prefix}objdump -D $in > $out
+{% if uf2_family %}
+
+rule uf2
+  command = mbs uf2conv -f {{uf2_family}} -o $out $in
+{% endif %}
+
 rule ar
   command = ar rcs $out $in
 

@@ -139,8 +139,38 @@ class NativeBuildEnvironment(LoggerMixin):
 
         return lib
 
+    def _write_app_phony_targets(
+        self, stream: TextIO, elfs: Dict[Path, Path], uf2_family: str = None
+    ) -> None:
+        """Write phony targets for all variants."""
+
+        elfs_list = list(elfs.values())
+
+        if elfs_list:
+            line = "build ${variant}_apps: phony "
+            offset = " " * len(line)
+
+            stream.write(line + str(elfs_list[0]))
+            for elf in elfs_list[1:]:
+                write_continuation(stream, offset)
+                stream.write(str(elf))
+            stream.write(linesep)
+
+            if uf2_family:
+                # Create uf2 phony.
+                line = "build ${variant}_uf2s: phony "
+                offset = " " * len(line)
+
+                uf2s = [x.with_suffix(".uf2") for x in elfs_list]
+
+                stream.write(line + str(uf2s[0]))
+                for elf in uf2s[1:]:
+                    write_continuation(stream, offset)
+                    stream.write(str(elf))
+                stream.write(linesep)
+
     def write_app_rules(
-        self, stream: TextIO, outputs: Set[Path]
+        self, stream: TextIO, outputs: Set[Path], uf2_family: str = None
     ) -> Dict[Path, Path]:
         """Write app rules."""
 
@@ -168,10 +198,23 @@ class NativeBuildEnvironment(LoggerMixin):
 
             stream.write(linesep + linesep)
 
-        line = "build ${variant}_apps: phony "
-        offset = " " * len(line)
+            # Write rules for other kinds of outputs.
+            for output in ["bin", "hex", "dump"]:
+                stream.write(
+                    f"build {elf.with_suffix('.' + output)}: {output} {elf}"
+                )
+                stream.write(linesep)
 
-        elfs_list = list(elfs.values())
+            if uf2_family:
+                stream.write(
+                    (
+                        f"build {elf.with_suffix('.uf2')}: "
+                        f"uf2 {elf.with_suffix('.hex')}"
+                    )
+                )
+                stream.write(linesep)
+
+            stream.write(linesep)
 
         # Add a phony target for creating a static library.
         if outputs:
@@ -182,11 +225,7 @@ class NativeBuildEnvironment(LoggerMixin):
                 + linesep
             )
 
-        stream.write(line + str(elfs_list[0]))
-        for elf in elfs_list[1:]:
-            write_continuation(stream, offset)
-            stream.write(str(elf))
-        stream.write(linesep)
+        self._write_app_phony_targets(stream, elfs, uf2_family=uf2_family)
 
         return elfs
 
@@ -279,7 +318,9 @@ class NativeBuildEnvironment(LoggerMixin):
         path = self.config.ninja_root.joinpath("apps.ninja")
         with self.log_time("Write '%s'", path):
             with path.open("w") as path_fd:
-                elfs = self.write_app_rules(path_fd, outputs)
+                elfs = self.write_app_rules(
+                    path_fd, outputs, self.config.data.get("uf2_family")
+                )
 
         # Render format file.
         render_format(

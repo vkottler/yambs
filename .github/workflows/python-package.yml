@@ -45,6 +45,15 @@ jobs:
       - run: pip${{matrix.python-version}} install -e .
       - run: mk python-editable
         if: matrix.system == 'ubuntu-latest'
+      - name: setup clang 17
+        run: |
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x ./llvm.sh
+          sudo ./llvm.sh 17
+          rm llvm.sh
+        if: matrix.system == 'ubuntu-latest'
+      - run: sudo apt-get install gcc-13 g++-13 clang-17 clang-format-17
+        if: matrix.system == 'ubuntu-latest'
       # End project-specific setup.
 
       - run: mk python-sa-types
@@ -76,7 +85,7 @@ jobs:
 
       - run: |
           mk python-release owner=vkottler \
-                            repo=yambs version=2.7.5
+                            repo=yambs version=2.8.0
         if: |
           matrix.python-version == '3.11'
           && matrix.system == 'ubuntu-latest'

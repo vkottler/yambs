@@ -6,6 +6,8 @@ cflag_groups:
 extra_dist: [extra]
 extra_sources: [src_extra]
 
+uf2_family: RP2040
+
 project:
   name: yambs
   github:
@@ -18,12 +20,21 @@ variants:
   rando_variant:
     enabled: false
 
+  debug:
+    suffix: &gcc_version "-13"
+    targets: [apps, lib, uf2s]
+
+  opt:
+    suffix: *gcc_version
+
   clang:
     cflag_groups: [debug]
+    suffix: &clang_version "-17"
 
   clang-opt:
     extra_cflags: [--coverage]
     cflag_groups: [opt]
+    suffix: *clang_version
 
 dependencies:
   - github: {repo: yambs-sample, owner: *self}
