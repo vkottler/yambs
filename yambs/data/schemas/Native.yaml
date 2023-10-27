@@ -33,3 +33,6 @@ properties:
     patternProperties:
       "^[a-zA-Z0-9-_.]+$":
         $ref: package://yambs/schemas/Variant.yaml
+
+  uf2_family:
+    type: string

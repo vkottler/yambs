@@ -6,6 +6,8 @@ cflag_groups:
 extra_dist: [extra]
 extra_sources: [src_extra]
 
+uf2_family: RP2040
+
 project:
   name: yambs
   github:

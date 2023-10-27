@@ -140,7 +140,7 @@ class NativeBuildEnvironment(LoggerMixin):
         return lib
 
     def write_app_rules(
-        self, stream: TextIO, outputs: Set[Path]
+        self, stream: TextIO, outputs: Set[Path], uf2_family: str = None
     ) -> Dict[Path, Path]:
         """Write app rules."""
 
@@ -171,8 +171,6 @@ class NativeBuildEnvironment(LoggerMixin):
         line = "build ${variant}_apps: phony "
         offset = " " * len(line)
 
-        elfs_list = list(elfs.values())
-
         # Add a phony target for creating a static library.
         if outputs:
             stream.write(
@@ -182,11 +180,17 @@ class NativeBuildEnvironment(LoggerMixin):
                 + linesep
             )
 
-        stream.write(line + str(elfs_list[0]))
-        for elf in elfs_list[1:]:
-            write_continuation(stream, offset)
-            stream.write(str(elf))
-        stream.write(linesep)
+        elfs_list = list(elfs.values())
+        if elfs_list:
+            stream.write(line + str(elfs_list[0]))
+            for elf in elfs_list[1:]:
+                write_continuation(stream, offset)
+                stream.write(str(elf))
+            stream.write(linesep)
+
+        # need to actually handle this
+        if uf2_family is not None:
+            print(uf2_family)
 
         return elfs
 
@@ -279,7 +283,9 @@ class NativeBuildEnvironment(LoggerMixin):
         path = self.config.ninja_root.joinpath("apps.ninja")
         with self.log_time("Write '%s'", path):
             with path.open("w") as path_fd:
-                elfs = self.write_app_rules(path_fd, outputs)
+                elfs = self.write_app_rules(
+                    path_fd, outputs, self.config.data.get("uf2_family")
+                )
 
         # Render format file.
         render_format(
