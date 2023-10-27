@@ -168,9 +168,6 @@ class NativeBuildEnvironment(LoggerMixin):
 
             stream.write(linesep + linesep)
 
-        line = "build ${variant}_apps: phony "
-        offset = " " * len(line)
-
         # Add a phony target for creating a static library.
         if outputs:
             stream.write(
@@ -179,6 +176,9 @@ class NativeBuildEnvironment(LoggerMixin):
                 + linesep
                 + linesep
             )
+
+        line = "build ${variant}_apps: phony "
+        offset = " " * len(line)
 
         elfs_list = list(elfs.values())
         if elfs_list:
