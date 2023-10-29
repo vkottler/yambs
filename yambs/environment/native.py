@@ -262,6 +262,25 @@ class NativeBuildEnvironment(LoggerMixin):
                 },
             )
 
+    def _handle_extra_source_dirs(self) -> None:
+        """Handle additional source directories (belonging to dependencies)."""
+
+        # Recurse directories from the dependency manager.
+        paths_recurse = [
+            (path, True) for path in self.dependency_manager.source_dirs
+        ]
+
+        # Don't recurse directories provided by the configuration.
+        paths_recurse.extend(
+            [
+                (combine_if_not_absolute(self.config.root, path), False)
+                for path in self.config.data.get("extra_sources", [])
+            ]
+        )
+
+        for path, recurse in paths_recurse:
+            collect_files(path, files=self.sources, recurse=recurse)
+
     def generate(self, sources_only: bool = False) -> None:
         """Generate ninja files."""
 
@@ -283,12 +302,7 @@ class NativeBuildEnvironment(LoggerMixin):
                 self.dependency_manager.link_flags
             )
 
-            # Handle additional source directories (belonging to dependencies).
-            for path in self.dependency_manager.source_dirs | {
-                combine_if_not_absolute(self.config.root, x)
-                for x in self.config.data.get("extra_sources", [])
-            }:
-                collect_files(path, files=self.sources)
+            self._handle_extra_source_dirs()
             populate_sources(
                 self.sources,
                 self.config.src_root,
