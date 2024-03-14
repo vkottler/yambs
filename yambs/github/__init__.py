@@ -70,9 +70,9 @@ def check_api_token() -> None:
 
     if "Authorization" not in GIHTUB_HEADERS:
         if "GITHUB_API_TOKEN" in os.environ:
-            GIHTUB_HEADERS[
-                "Authorization"
-            ] = f"Bearer {os.environ['GITHUB_API_TOKEN']}"
+            GIHTUB_HEADERS["Authorization"] = (
+                f"Bearer {os.environ['GITHUB_API_TOKEN']}"
+            )
 
 
 def release_data(
