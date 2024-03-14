@@ -169,3 +169,68 @@ def write_phony(
                 stream.write(f"{BUILD_DIR_VAR}/{src.with_suffix(suffix)}")
 
             stream.write(linesep)
+
+
+def write_link(
+    stream: TextIO,
+    output: Path,
+    entry_object: Path,
+    outputs: Set[Path],
+    wasm: bool = False,
+) -> None:
+    """Write a 'link' rule."""
+
+    pairs = [(output.suffix, entry_object.suffix, "link")]
+
+    if wasm:
+        pairs.append((".html", ".wasm", "link_no_map"))
+
+    for out_suffix, entry_suffx, rule in pairs:
+        line = f"build {output.with_suffix(out_suffix)}: {rule} "
+        offset = " " * len(line)
+
+        stream.write(line + str(entry_object.with_suffix(entry_suffx)))
+
+        for file in outputs:
+            write_continuation(stream, offset)
+            stream.write(str(file.with_suffix(entry_suffx)))
+
+        # Executables can't be linked until third-party dependencies are
+        # actually built.
+        stream.write(" | ${variant}_third_party" + linesep + linesep)
+
+
+def variant_phony(
+    stream: TextIO,
+    elfs_list: list[Path],
+    uf2_family: str = None,
+    wasm: bool = False,
+):
+    """Write variant-specific phony targets."""
+
+    line = "build ${variant}_apps: phony "
+    offset = " " * len(line)
+
+    stream.write(line + str(elfs_list[0]))
+    for elf in elfs_list[1:]:
+        write_continuation(stream, offset)
+        stream.write(str(elf))
+    stream.write(linesep)
+
+    suffixes = []
+    if wasm:
+        suffixes.append("html")
+    if uf2_family:
+        suffixes.append("uf2")
+
+    for suffix in suffixes:
+        line = "build ${variant}_" + f"{suffix}s: phony "
+        offset = " " * len(line)
+
+        outputs = [x.with_suffix("." + suffix) for x in elfs_list]
+
+        stream.write(line + str(outputs[0]))
+        for elf in outputs[1:]:
+            write_continuation(stream, offset)
+            stream.write(str(elf))
+        stream.write(linesep)

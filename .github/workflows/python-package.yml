@@ -55,6 +55,10 @@ jobs:
         if: matrix.system == 'ubuntu-latest'
       - run: sudo apt-get install gcc-13 g++-13 clang-17 clang-format-17
         if: matrix.system == 'ubuntu-latest'
+      - run: sudo apt-get install emscripten
+        if: matrix.system == 'ubuntu-latest'
+      - run: em++ --version
+        if: matrix.system == 'ubuntu-latest'
       # End project-specific setup.
 
       - run: mk python-sa-types
@@ -86,7 +90,7 @@ jobs:
 
       - run: |
           mk python-release owner=vkottler \
-                            repo=yambs version=2.8.1
+                            repo=yambs version=3.0.0
         if: |
           matrix.python-version == '3.11'
           && matrix.system == 'ubuntu-latest'

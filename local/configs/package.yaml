@@ -14,6 +14,7 @@ ci_local:
   - "- run: mk python-editable"
   - "  if: matrix.system == 'ubuntu-latest'"
 
+  # Get latest clang.
   - "- name: setup clang 17"
   - "  run: |"
   - "    wget https://apt.llvm.org/llvm.sh"
@@ -22,7 +23,14 @@ ci_local:
   - "    rm llvm.sh"
   - "  if: matrix.system == 'ubuntu-latest'"
 
+  # Native toolchains.
   - "- run: sudo apt-get install gcc-13 g++-13 clang-17 clang-format-17"
+  - "  if: matrix.system == 'ubuntu-latest'"
+
+  # WASM.
+  - "- run: sudo apt-get install emscripten"
+  - "  if: matrix.system == 'ubuntu-latest'"
+  - "- run: em++ --version"
   - "  if: matrix.system == 'ubuntu-latest'"
 
 requirements:
