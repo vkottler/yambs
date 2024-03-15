@@ -18,7 +18,8 @@ ldflag_groups:
 variants:
 
   debug:
-    cflag_groups: [asan]
+    # asan - manually opt-in
+    cflag_groups: []
 
   opt: {}
 
