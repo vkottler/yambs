@@ -2,11 +2,11 @@
     =====================================
     generator=datazen
     version=3.1.4
-    hash=4976235943725fd73fdb02c40af8f1cb
+    hash=807e0a42a738120cbe4629477dbbafe5
     =====================================
 -->
 
-# yambs ([2.8.1](https://pypi.org/project/yambs/))
+# yambs ([3.0.0](https://pypi.org/project/yambs/))
 
 [![python](https://img.shields.io/pypi/pyversions/yambs.svg)](https://pypi.org/project/yambs/)
 ![Build Status](https://github.com/vkottler/yambs/workflows/Python%20Package/badge.svg)
@@ -30,6 +30,7 @@
 This package is tested with the following Python minor versions:
 
 * [`python3.11`](https://docs.python.org/3.11/)
+* [`python3.12`](https://docs.python.org/3.12/)
 
 ## Platform Support
 

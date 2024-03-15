@@ -92,8 +92,7 @@ class BuildEnvironment(LoggerMixin):
                     yield source
                     visited.add(source)
 
-        for item in self.first_party_headers:
-            yield item
+        yield from self.first_party_headers
 
     def set_board_sources(
         self, board: Board, regular: Set[Path], apps: Set[Path]

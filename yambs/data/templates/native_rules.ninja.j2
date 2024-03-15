@@ -19,6 +19,9 @@ ldflags = $common_ldflags $variant_ldflags
 rule link
   command = $ld $cflags -Wl,-Map=$out.map $in $ldflags -o $out
 
+rule link_no_map
+  command = $ld $cflags $in $ldflags -o $out
+
 rule bin
   command = ${toolchain_prefix}objcopy -O binary $in $out
 

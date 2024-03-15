@@ -10,29 +10,17 @@ from typing import Any, Dict, Optional, Set, TextIO
 # third-party
 from vcorelib.io import ARBITER
 from vcorelib.logging import LoggerMixin
-from vcorelib.paths import Pathlike, normalize
 
 # internal
 from yambs.aggregation import collect_files, populate_sources, sources_headers
 from yambs.config.native import Native
 from yambs.dependency.manager import DependencyManager
 from yambs.generate.common import APP_ROOT, get_jinja, render_template
-from yambs.generate.ninja import write_continuation
+from yambs.generate.ninja import variant_phony, write_continuation, write_link
 from yambs.generate.ninja.format import render_format
 from yambs.generate.variants import generate as generate_variants
+from yambs.paths import combine_if_not_absolute, resolve_build_dir
 from yambs.translation import BUILD_DIR_PATH, get_translator
-
-
-def resolve_build_dir(build_root: Path, variant: str, path: Path) -> Path:
-    """Resolve the build-directory variable in a path."""
-    return build_root.joinpath(variant, path.relative_to(BUILD_DIR_PATH))
-
-
-def combine_if_not_absolute(root: Path, candidate: Pathlike) -> Path:
-    """https://github.com/vkottler/ifgen/blob/master/ifgen/paths.py"""
-
-    candidate = normalize(candidate)
-    return candidate if candidate.is_absolute() else root.joinpath(candidate)
 
 
 class NativeBuildEnvironment(LoggerMixin):
@@ -65,7 +53,9 @@ class NativeBuildEnvironment(LoggerMixin):
                 self.jinja, root, f"native_{name}", self.config.data, out=name
             )
 
-    def write_compile_line(self, stream: TextIO, path: Path) -> Path:
+    def write_compile_line(
+        self, stream: TextIO, path: Path, wasm: bool = False
+    ) -> Path:
         """Write a single source-compile line."""
 
         translator = get_translator(path)
@@ -73,13 +63,12 @@ class NativeBuildEnvironment(LoggerMixin):
 
         out = translator.output(from_src)
 
-        stream.write(f"build {out}: {translator.rule} $src_dir/{from_src}")
-        stream.write(linesep)
+        translator.write(stream, out, f"$src_dir/{from_src}", wasm=wasm)
 
         return out
 
     def write_third_party_line(
-        self, stream: TextIO, path: Path
+        self, stream: TextIO, path: Path, wasm: bool = False
     ) -> Optional[Path]:
         """Write a single source-compile line for a third-party source."""
 
@@ -98,23 +87,25 @@ class NativeBuildEnvironment(LoggerMixin):
                 Path("$build_dir", "third-party", rel_part)
             )
 
-            stream.write(
-                f"build {out}: {translator.rule} $third_party_dir/{rel_part}"
+            translator.write(
+                stream, out, f"$third_party_dir/{rel_part}", wasm=wasm
             )
-            stream.write(linesep)
 
         return out
 
-    def write_source_rules(self, stream: TextIO) -> Set[Path]:
+    def write_source_rules(
+        self, stream: TextIO, wasm: bool = False
+    ) -> Set[Path]:
         """Write source rules."""
 
         result = {
-            self.write_compile_line(stream, path) for path in self.regular
+            self.write_compile_line(stream, path, wasm=wasm)
+            for path in self.regular
         }
 
         # Add third-party sources.
         for path in self.third_party:
-            path_result = self.write_third_party_line(stream, path)
+            path_result = self.write_third_party_line(stream, path, wasm=wasm)
             if path_result is not None:
                 result.add(path_result)
 
@@ -140,37 +131,24 @@ class NativeBuildEnvironment(LoggerMixin):
         return lib
 
     def _write_app_phony_targets(
-        self, stream: TextIO, elfs: Dict[Path, Path], uf2_family: str = None
+        self,
+        stream: TextIO,
+        elfs: Dict[Path, Path],
+        uf2_family: str = None,
+        wasm: bool = False,
     ) -> None:
         """Write phony targets for all variants."""
 
         elfs_list = list(elfs.values())
-
         if elfs_list:
-            line = "build ${variant}_apps: phony "
-            offset = " " * len(line)
-
-            stream.write(line + str(elfs_list[0]))
-            for elf in elfs_list[1:]:
-                write_continuation(stream, offset)
-                stream.write(str(elf))
-            stream.write(linesep)
-
-            if uf2_family:
-                # Create uf2 phony.
-                line = "build ${variant}_uf2s: phony "
-                offset = " " * len(line)
-
-                uf2s = [x.with_suffix(".uf2") for x in elfs_list]
-
-                stream.write(line + str(uf2s[0]))
-                for elf in uf2s[1:]:
-                    write_continuation(stream, offset)
-                    stream.write(str(elf))
-                stream.write(linesep)
+            variant_phony(stream, elfs_list, uf2_family=uf2_family, wasm=wasm)
 
     def write_app_rules(
-        self, stream: TextIO, outputs: Set[Path], uf2_family: str = None
+        self,
+        stream: TextIO,
+        outputs: Set[Path],
+        uf2_family: str = None,
+        wasm: bool = False,
     ) -> Dict[Path, Path]:
         """Write app rules."""
 
@@ -178,25 +156,13 @@ class NativeBuildEnvironment(LoggerMixin):
 
         # Create rules for linked executables.
         for path in self.apps:
-            out = self.write_compile_line(stream, path)
+            out = self.write_compile_line(stream, path, wasm=wasm)
 
             from_src = path.relative_to(self.config.src_root)
             elf = BUILD_DIR_PATH.joinpath(from_src.with_suffix(".elf"))
             elfs[path] = elf
-            line = f"build {elf}: link "
-            offset = " " * len(line)
 
-            stream.write(line + str(out))
-
-            for file in outputs:
-                write_continuation(stream, offset)
-                stream.write(str(file))
-
-            # Executables can't be linked until third-party dependencies are
-            # actually built.
-            stream.write(" | ${variant}_third_party")
-
-            stream.write(linesep + linesep)
+            write_link(stream, elf, out, outputs, wasm=wasm)
 
             # Write rules for other kinds of outputs.
             for output in ["bin", "hex", "dump"]:
@@ -225,7 +191,9 @@ class NativeBuildEnvironment(LoggerMixin):
                 + linesep
             )
 
-        self._write_app_phony_targets(stream, elfs, uf2_family=uf2_family)
+        self._write_app_phony_targets(
+            stream, elfs, uf2_family=uf2_family, wasm=wasm
+        )
 
         return elfs
 
@@ -284,6 +252,8 @@ class NativeBuildEnvironment(LoggerMixin):
     def generate(self, sources_only: bool = False) -> None:
         """Generate ninja files."""
 
+        wasm = self.config.has_variant("wasm")
+
         if not sources_only:
             # Audit dependencies.
             for dep in self.config.dependencies:
@@ -326,14 +296,17 @@ class NativeBuildEnvironment(LoggerMixin):
         path = self.config.ninja_root.joinpath("sources.ninja")
         with self.log_time("Write '%s'", path):
             with path.open("w") as path_fd:
-                outputs = self.write_source_rules(path_fd)
+                outputs = self.write_source_rules(path_fd, wasm=wasm)
 
         # Render apps file.
         path = self.config.ninja_root.joinpath("apps.ninja")
         with self.log_time("Write '%s'", path):
             with path.open("w") as path_fd:
                 elfs = self.write_app_rules(
-                    path_fd, outputs, self.config.data.get("uf2_family")
+                    path_fd,
+                    outputs,
+                    self.config.data.get("uf2_family"),
+                    wasm=wasm,
                 )
 
         # Render format file.

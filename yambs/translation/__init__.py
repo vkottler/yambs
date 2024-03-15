@@ -5,8 +5,9 @@ outputs.
 
 # built-in
 from functools import lru_cache
+from os import linesep
 from pathlib import Path
-from typing import NamedTuple, Optional
+from typing import NamedTuple, Optional, TextIO
 
 HEADER_EXTENSIONS = {".h", ".hpp"}
 BUILD_DIR_VAR = "$build_dir"
@@ -43,6 +44,26 @@ class SourceTranslator(NamedTuple):
     def generated_header(self) -> bool:
         """Determine if this translation produces a header file."""
         return self.output_extension in HEADER_EXTENSIONS
+
+    def write(
+        self,
+        stream: TextIO,
+        out: Path,
+        source: str,
+        rule: str = "build",
+        wasm: bool = False,
+    ) -> None:
+        """Write a ninja rule to the stream."""
+
+        stream.write(f"{rule} {out}: {self.rule} {source}")
+        stream.write(linesep)
+
+        # Also add a '.wasm' variant.
+        if wasm:
+            stream.write(
+                (f"build {out.with_suffix('.wasm')}: " f"{self.rule} {source}")
+            )
+            stream.write(linesep)
 
 
 DEFAULT = SourceTranslator()
