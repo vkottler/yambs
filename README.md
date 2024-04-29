@@ -2,7 +2,7 @@
     =====================================
     generator=datazen
     version=3.1.4
-    hash=454db224964265a8f876fd45d5428729
+    hash=764ff2be264d6b91ce3832ef00736629
     =====================================
 -->
 
@@ -131,7 +131,7 @@ following a specific convention), put your configuration data here.
 # Command-line Options
 
 ```
-$ ./venv3.11/bin/mbs -h
+$ ./venv3.12/bin/mbs -h
 
 usage: mbs [-h] [--version] [-v] [-q] [--curses] [--no-uvloop] [-C DIR]
            {compile_config,dist,download,gen,native,uf2conv,noop} ...
@@ -165,7 +165,7 @@ commands:
 ### `compile_config`
 
 ```
-$ ./venv3.11/bin/mbs compile_config -h
+$ ./venv3.12/bin/mbs compile_config -h
 
 usage: mbs compile_config [-h] [-i INCLUDES_KEY] [-u] [-e]
                           output inputs [inputs ...]
@@ -190,7 +190,7 @@ options:
 ### `dist`
 
 ```
-$ ./venv3.11/bin/mbs dist -h
+$ ./venv3.12/bin/mbs dist -h
 
 usage: mbs dist [-h] [-c CONFIG] [-s]
 
@@ -206,7 +206,7 @@ options:
 ### `download`
 
 ```
-$ ./venv3.11/bin/mbs download -h
+$ ./venv3.12/bin/mbs download -h
 
 usage: mbs download [-h] [-o OWNER] [-r REPO] [-O OUTPUT] [-p PATTERN]
 
@@ -226,7 +226,7 @@ options:
 ### `gen`
 
 ```
-$ ./venv3.11/bin/mbs gen -h
+$ ./venv3.12/bin/mbs gen -h
 
 usage: mbs gen [-h] [-c CONFIG] [-i] [-w] [-s] [-n]
 
@@ -246,7 +246,7 @@ options:
 ### `native`
 
 ```
-$ ./venv3.11/bin/mbs native -h
+$ ./venv3.12/bin/mbs native -h
 
 usage: mbs native [-h] [-c CONFIG] [-i] [-w] [-s] [-n]
 
@@ -266,7 +266,7 @@ options:
 ### `uf2conv`
 
 ```
-$ ./venv3.11/bin/mbs uf2conv -h
+$ ./venv3.12/bin/mbs uf2conv -h
 
 usage: mbs uf2conv [-h] [-b BASE] [-f FAMILY] [-o FILE] [-d DEVICE_PATH] [-l]
                    [-c] [-D] [-w] [-C] [-i]
