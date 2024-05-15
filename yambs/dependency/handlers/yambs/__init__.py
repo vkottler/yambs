@@ -47,6 +47,8 @@ def handle_source(task: DependencyTask) -> Path:
     Determine the directory that a given dependency's sources can be found in.
     """
 
+    directory = None
+
     if task.dep.source == DependencySource.GITHUB:
         audit_downloads(
             task.root, task.data, github_release(task.dep, task.data)
@@ -57,6 +59,7 @@ def handle_source(task: DependencyTask) -> Path:
         assert task.dep.directory is not None
         directory = task.dep.directory
 
+    assert directory is not None
     return directory
 
 
