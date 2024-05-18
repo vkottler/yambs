@@ -3,7 +3,7 @@ cflag_groups:
   debug: [-Og, -g]
   opt: [-O2]
 
-extra_dist: [extra]
+extra_dist: [extra/test.txt, extra2, extra3/subdir]
 extra_sources: [src_extra]
 
 uf2_family: RP2040
@@ -21,7 +21,7 @@ variants:
     enabled: false
 
   debug:
-    suffix: &gcc_version "-13"
+    suffix: &gcc_version "-12"
     targets: [apps, lib, uf2s]
 
   opt:
