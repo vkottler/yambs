@@ -8,6 +8,7 @@ from shutil import copy2, copytree, make_archive
 from typing import Any, Dict
 
 # third-party
+from vcorelib.paths import rel
 from vcorelib.paths.context import in_dir
 
 # internal
@@ -61,10 +62,15 @@ def copy_source_tree(config: CommonConfig, dest: Path) -> None:
         + [root.joinpath(x) for x in config.data.get("extra_dist", [])]
         if x and x.exists()
     ]:
+        relpath = rel(item, base=root)
+
+        curr_dest = dest.joinpath(relpath)
+        curr_dest.parent.mkdir(parents=True, exist_ok=True)
+
         if item.is_dir():
-            copytree(item, dest.joinpath(item.name))
+            copytree(item, curr_dest)
         else:
-            copy2(item, dest.joinpath(item.name))
+            copy2(item, curr_dest)
 
 
 def dist_metadata() -> Dict[str, Any]:
