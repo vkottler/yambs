@@ -2,11 +2,11 @@
     =====================================
     generator=datazen
     version=3.1.4
-    hash=72271a00d30bf23159c35289b5ff7a00
+    hash=934a1cb8be74864c521e3c3d3875e01d
     =====================================
 -->
 
-# yambs ([3.0.2](https://pypi.org/project/yambs/))
+# yambs ([3.0.3](https://pypi.org/project/yambs/))
 
 [![python](https://img.shields.io/pypi/pyversions/yambs.svg)](https://pypi.org/project/yambs/)
 ![Build Status](https://github.com/vkottler/yambs/workflows/Python%20Package/badge.svg)
@@ -216,7 +216,7 @@ options:
                         repository owner (default: 'vkottler')
   -r REPO, --repo REPO  repository name (default: 'toolchains')
   -O OUTPUT, --output OUTPUT
-                        output directory (default: 'toolchains')
+                        output directory (default: '.')
   -p PATTERN, --pattern PATTERN
                         a pattern to use to select project specifications
                         filtered by name

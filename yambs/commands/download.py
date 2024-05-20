@@ -13,6 +13,8 @@ from vcorelib.args import CommandFunction as _CommandFunction
 # internal
 from yambs.dependency.github import GithubDependency, default_filt
 
+DEFAULT_PATTERN = ".*"
+
 
 def download_cmd(args: _Namespace) -> int:
     """Execute the download command."""
@@ -20,8 +22,10 @@ def download_cmd(args: _Namespace) -> int:
     dep = GithubDependency(args.owner, args.repo)
 
     # Download and extract things.
+    args.output.mkdir(parents=True, exist_ok=True)
     dep.download_release_assets(
-        default_filt(args.output, pattern=args.pattern)
+        default_filt(args.output.joinpath(args.repo), pattern=args.pattern),
+        strict=args.pattern == DEFAULT_PATTERN,
     )
 
     return 0
@@ -46,13 +50,13 @@ def add_download_cmd(parser: _ArgumentParser) -> _CommandFunction:
         "-O",
         "--output",
         type=Path,
-        default=Path("toolchains"),
+        default=Path(),
         help="output directory (default: '%(default)s')",
     )
     parser.add_argument(
         "-p",
         "--pattern",
-        default=".*",
+        default=DEFAULT_PATTERN,
         help=(
             "a pattern to use to select project "
             "specifications filtered by name"
