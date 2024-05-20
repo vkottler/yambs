@@ -3,6 +3,7 @@ Test the 'commands.download' module.
 """
 
 # built-in
+import platform
 from tempfile import TemporaryDirectory
 
 # module under test
@@ -14,4 +15,16 @@ def test_download_basic():
     """Test the 'download' command."""
 
     with TemporaryDirectory() as tmpdir:
-        assert yambs_main([PKG_NAME, "-C", str(tmpdir), "download"]) == 0
+        assert (
+            yambs_main(
+                [
+                    PKG_NAME,
+                    "-C",
+                    str(tmpdir),
+                    "download",
+                    "-p",
+                    platform.machine(),
+                ]
+            )
+            == 0
+        )

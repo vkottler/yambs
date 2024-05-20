@@ -54,7 +54,9 @@ def default_filt(
     return filt
 
 
-def ensure_extracted(path: Path, logger: LoggerType = None) -> None:
+def ensure_extracted(
+    path: Path, strict: bool = True, logger: LoggerType = None
+) -> None:
     """Ensure that all archive files in a directory are extracted."""
 
     for item in path.iterdir():
@@ -75,7 +77,7 @@ def ensure_extracted(path: Path, logger: LoggerType = None) -> None:
                         nano_str(result[1], is_time=True),
                     )
 
-                assert dest.is_dir(), dest
+                assert not strict or dest.is_dir(), dest
 
 
 class GithubDependency(LoggerMixin):
@@ -111,7 +113,7 @@ class GithubDependency(LoggerMixin):
         }
 
     def download_release_assets(
-        self, filt: AssetFilter, extract: bool = True
+        self, filt: AssetFilter, extract: bool = True, strict: bool = True
     ) -> None:
         """Ensure release assets are downloaded."""
 
@@ -121,4 +123,6 @@ class GithubDependency(LoggerMixin):
                 download_file_if_missing(asset["browser_download_url"], dest)
 
                 if extract:
-                    ensure_extracted(dest.parent, logger=self.logger)
+                    ensure_extracted(
+                        dest.parent, strict=strict, logger=self.logger
+                    )
