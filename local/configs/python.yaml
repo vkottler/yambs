@@ -5,7 +5,7 @@ author_info:
   username: vkottler
 
 # CI matrix.
-versions: ["3.11", "3.12"]
+versions: ["3.12"]
 systems:
   - macos-latest
   - windows-latest

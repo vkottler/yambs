@@ -3,6 +3,7 @@ A module for writing formatting-related ninja build rules.
 """
 
 # built-in
+from itertools import batched
 from os import linesep
 from pathlib import Path
 from typing import Iterable, TextIO
@@ -30,6 +31,27 @@ def render_format(
         write_format_target(path_fd, paths, suffix, root)
 
 
+def final_format_targets(
+    stream: TextIO, by_kind: dict[str, list[str]]
+) -> None:
+    """Create final, highest-level format targets."""
+
+    for target, deps in by_kind.items():
+        if deps:
+            stream.write(linesep)
+
+            line = f"build {target}: phony "
+            offset = " " * len(line)
+
+            stream.write(line)
+            stream.write(deps[0])
+            for dep in deps[1:]:  # pragma: nocover
+                write_continuation(stream, offset)
+                stream.write(dep)
+
+            stream.write(linesep)
+
+
 def write_format_target(
     stream: TextIO, paths: Iterable[Path], suffix: str, root: Path = None
 ) -> None:
@@ -48,22 +70,31 @@ def write_format_target(
     stream.write("rule clang-format-check" + linesep)
     stream.write(f"  command = {cmd} -n --Werror $in" + linesep)
 
-    paths = list(paths)
-    if paths:
-        for sfx in ["", "-check"]:
+    targets = [("format", ""), ("format-check", "-check")]
+    by_kind: dict[str, list[str]] = {"format": [], "format-check": []}
+
+    # Write format rules in groups of files to ensure command-line invocations
+    # don't get too long.
+    for idx, group in enumerate(batched(paths, 64)):
+        for kind, sfx in targets:
             stream.write(linesep)
-            line = f"build format{sfx}: clang-format{sfx} "
+            target = f"format-{idx}{sfx}"
+            by_kind[kind].append(target)
+            line = f"build {target}: clang-format{sfx} "
             offset = " " * len(line)
 
             stream.write(line)
             stream.write(
-                str(paths[0] if root is None else rel(paths[0], base=root))
+                str(group[0] if root is None else rel(group[0], base=root))
             )
 
-            for source in paths[1:]:
+            for source in group[1:]:
                 write_continuation(stream, offset)
                 stream.write(
                     str(source if root is None else rel(source, base=root))
                 )
 
             stream.write(linesep)
+
+    # Create final target.
+    final_format_targets(stream, by_kind)
