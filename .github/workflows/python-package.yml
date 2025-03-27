@@ -37,7 +37,7 @@ jobs:
           python-version: ${{matrix.python-version}}
           cache: pip
 
-      - run: pip${{matrix.python-version}} install vmklib
+      - run: pip${{matrix.python-version}} install vmklib>=2.0.3
 
       # Begin project-specific setup.
       - uses: seanmiddleditch/gha-setup-ninja@master
@@ -94,7 +94,7 @@ jobs:
 
       - run: |
           mk python-release owner=vkottler \
-                            repo=yambs version=3.0.4
+                            repo=yambs version=3.0.5
         if: |
           matrix.python-version == '3.12'
           && matrix.system == 'ubuntu-latest'
